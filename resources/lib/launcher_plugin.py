@@ -268,7 +268,6 @@ class Main:
                     self._add_new_launcher(category)
                 else:
                     self._get_launchers(category)
-
         else:
             self._print_log(__language__( 30739 ))
             if (len(self.categories) == 0):
@@ -281,7 +280,10 @@ class Main:
                     self._save_launchers()
                     self._get_launchers('default')
             else:
-                self._get_categories()
+                if (self.settings[ "open_default_cat" ] ):
+                    self._get_launchers('default')
+                else:
+                    self._get_categories()
 
     def _empty_cat(self, categoryID):
         empty_category = True
@@ -1655,6 +1657,7 @@ class Main:
         self.settings[ "nb_backup_files" ] = int(round(float(__settings__.getSetting( "nb_backup_files" ))))
         self.settings[ "show_log" ] = ( __settings__.getSetting( "show_log" ) == "true" )
         self.settings[ "hide_default_cat" ] = ( __settings__.getSetting( "hide_default_cat" ) == "true" )
+        self.settings[ "open_default_cat" ] = ( __settings__.getSetting( "open_default_cat" ) == "true" )
 
     def _print_log(self,string):
         if (self.settings[ "show_log" ]):

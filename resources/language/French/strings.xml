@@ -123,6 +123,21 @@
     <string id="30178">Captures d'écran</string>
     <string id="30179">Flyers</string>
     <string id="30180">Régler le délais du lanceur (ms)</string>
+    <string id="30181">Options de sauvegarde</string>
+    <string id="30182">Activer la sauvegarde automatique</string>
+    <string id="30183">Avancé</string>
+    <string id="30184">Nombre de sauvegardes à conserver</string>
+    <string id="30185">Importer un fichier XML (restaurer une sauvegarde)</string>
+    <string id="30186">Choisir le fichier XML à importer</string>
+    <string id="30187">Afficher les logs d'Advanced Launcher dans xbmc.log</string>
+    <string id="30188">Options d'affichage</string>
+    <string id="30189">Cacher la catégorie "Default"</string>
+    <string id="30190">Fusionner un fichier XML (joindre les listes de lanceurs)</string>
+    <string id="30191">Choisir le fichier XML à fusionner</string>
+    <string id="30192">Fusionner</string>
+    <string id="30193">Option de démarrage des lanceurs</string>
+    <string id="30194">Ajouter un nouveau lanceur</string>
+    <string id="30195">Ouvrir Advanced Launcher directement dans la catégorie "Default"</string>
 
     <string id="30201">défaut</string>
     <string id="30202">Utilisateurs expérimentés</string>

@@ -48,6 +48,7 @@
         <setting id="separator" type="lsep" label="30188"/>
         <setting label="30176" type="bool" id="hide_finished" default="false" />
         <setting label="30189" type="bool" id="hide_default_cat" default="false" />
+        <setting label="30195" type="bool" id="open_default_cat" default="false" />
         <setting label="30160" type="bool" id="launcher_notification" default="false" />
         <setting id="separator" type="lsep" label="30170"/>
         <setting label="30125" type="folder" id="launcher_thumb_path" default="" source="auto" />

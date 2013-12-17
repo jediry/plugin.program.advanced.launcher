@@ -1,5 +1,7 @@
 [B]2.1.0[/B]
+. Add an option to directly open Advanced Launcher into default category.
 . Update launchers.xml file format.
+. Update french translation.
 
 [B]2.0.15[/B]
 . Update German translation (thanks to mbroemme).
