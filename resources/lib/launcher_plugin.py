@@ -13,64 +13,44 @@
 """
 
 # -*- coding: UTF-8 -*
-# main imports
-import sys
-import os
-import fnmatch
-import xbmc
-import xbmcgui
-import xbmcplugin
-
-import time, datetime
-import math
-import re
-import urllib, urllib2
-import subprocess_hack
-import socket
-import exceptions
-
-import random
+import sys, os, fnmatch, time, datetime, math, random, shutil
+import re, urllib, urllib2, subprocess_hack, socket, exceptions
 from traceback import print_exc
 from operator import itemgetter
 
-import shutil
+import xbmc, xbmcgui, xbmcplugin
+from xbmcaddon import Addon
+
+import subprocess_hack
 from user_agent import getUserAgent
 from file_item import Thumbnails
-thumbnails = Thumbnails()
 
+# Dharma compatibility (import md5)
 try:
-    # Eden & + compatible
     import hashlib
 except:
-    # Dharma compatible
     import md5
 
-from xbmcaddon import Addon
+# Addon paths definition
 PLUGIN_DATA_PATH = xbmc.translatePath( os.path.join( "special://profile/addon_data", "plugin.program.advanced.launcher") )
-__settings__ = Addon( id="plugin.program.advanced.launcher" )
-__lang__ = __settings__.getLocalizedString
-
-def __language__(string):
-    return __lang__(string).encode('utf-8','ignore')
-
-# source path for launchers data
 BASE_PATH = xbmc.translatePath( os.path.join( "special://" , "profile" ) )
 BASE_CURRENT_SOURCE_PATH = os.path.join( PLUGIN_DATA_PATH , "launchers.xml" )
 TEMP_CURRENT_SOURCE_PATH = os.path.join( PLUGIN_DATA_PATH , "launchers.tmp" )
 MERGED_SOURCE_PATH = os.path.join(PLUGIN_DATA_PATH , "merged-launchers.xml" )
-
+DEFAULT_THUMB_PATH = os.path.join( PLUGIN_DATA_PATH , "thumbs" )
+DEFAULT_FANART_PATH = os.path.join( PLUGIN_DATA_PATH , "fanarts" )
+DEFAULT_NFO_PATH = os.path.join( PLUGIN_DATA_PATH , "nfos" )
+DEFAULT_BACKUP_PATH = os.path.join( PLUGIN_DATA_PATH , "backups" )
 SHORTCUT_FILE = os.path.join( PLUGIN_DATA_PATH , "shortcut.cut" )
 
-DEFAULT_THUMB_PATH = os.path.join( PLUGIN_DATA_PATH , "thumbs" )
+# Addon paths creation
 if not os.path.exists(DEFAULT_THUMB_PATH): os.makedirs(DEFAULT_THUMB_PATH)
-DEFAULT_FANART_PATH = os.path.join( PLUGIN_DATA_PATH , "fanarts" )
 if not os.path.exists(DEFAULT_FANART_PATH): os.makedirs(DEFAULT_FANART_PATH)
-DEFAULT_NFO_PATH = os.path.join( PLUGIN_DATA_PATH , "nfos" )
 if not os.path.exists(DEFAULT_NFO_PATH): os.makedirs(DEFAULT_NFO_PATH)
-DEFAULT_BACKUP_PATH = os.path.join( PLUGIN_DATA_PATH , "backups" )
 if not os.path.exists(DEFAULT_BACKUP_PATH): os.makedirs(DEFAULT_BACKUP_PATH)
+if not os.path.isdir(PLUGIN_DATA_PATH): os.makedirs(PLUGIN_DATA_PATH)
 
-
+# Addon commands
 REMOVE_COMMAND = "%%REMOVE%%"
 BACKUP_COMMAND = "%%BACKUP%%"
 APPEND_COMMAND = "%%APPEND%%"
@@ -89,43 +69,22 @@ SEARCH_STUDIO_COMMAND = "%%SEARCH_STUDIO%%"
 SEARCH_GENRE_COMMAND = "%%SEARCH_GENRE%%"
 SCAN_NEW_ITEM_COMMAND = "%%SCAN_NEW_ITEM%%"
 
+# Locales parameters
+__settings__ = Addon( id="plugin.program.advanced.launcher" )
+__lang__ = __settings__.getLocalizedString
+
+def __language__(string):
+    return __lang__(string).encode('utf-8','ignore')
+
+# Main code
+
 class Main:
-    BASE_CACHE_PATH = xbmc.translatePath(os.path.join( "special://profile/Thumbnails", "Pictures" ))
     launchers = {}
     categories = {}
-
-    ''' initializes plugin and run the requiered action
-        arguments:
-            argv[0] - the path of the plugin (supplied by XBMC)
-            argv[1] - the handle of the plugin (supplied by XBMC)
-            argv[2] - one of the following can be any category, launcher or rom id created with the plugin) :
-
-                /%%ADD%% - add a new category
-                /category - open the specific category (if exists) and browse its launchers.
-                /category/%%REMOVE%% - remove the category
-
-                /category/%%ADD%% - add a new launcher (open wizard)
-                /category/launcher - open the specific launcher (if exists) and browse its roms. if the launcher is standalone - run it.
-                /category/launcher/%%GET_INFO%% - get launcher info from configured scraper
-                /category/launcher/%%GET_THUMB%% - get launcher thumb from configured scraper
-                /category/launcher/%%GET_FANART%% - get launcher fanart from configured scraper
-                /category/launcher/%%REMOVE%% - remove the launcher
-                /category/launcher/%%SCAN_NEW_ITEM%% - scan launcher folder for new item
-
-                /category/launcher/%%ADD%% - add a new rom (open wizard)
-                /category/launcher/rom - run the specifiec rom using it's launcher. ignore command if doesn't exists.
-                /category/launcher/rom/%%GET_INFO%% - get rom info from configured scraper
-                /category/launcher/rom/%%GET_THUMB%% - get rom thumb from configured scraper
-                /category/launcher/rom/%%GET_FANART%% - get rom fanart from configured scraper
-                /category/launcher/rom/%%REMOVE%% - remove the rom
-
-                (blank)     - open a list of the available launchers. if no launcher exists - open the launcher creation wizard.
-    '''
 
     def __init__( self, *args, **kwargs ):
         # store an handle pointer
         self._handle = int(sys.argv[ 1 ])
-
         self._path = sys.argv[ 0 ]
 
         # get users preference
@@ -245,8 +204,6 @@ class Main:
                 self._print_log(__language__( 30740 ) % category)
 
                 if (category == SCAN_NEW_ITEM_COMMAND):
-					print self._path
-					print self._handle
 					self._find_roms()
                 if (category == SEARCH_COMMAND):
                     self._find_roms()
@@ -943,15 +900,9 @@ class Main:
             os.remove(nfo_file+".tmp")
             xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30087 ) % os.path.basename(nfo_file).encode('utf8','ignore')))
         else:
+            nfo_content = "<game>\n\t<title>"+self.launchers[launcher]["roms"][rom]["name"]+"</title>\n\t<platform>"+self.launchers[launcher]["roms"][rom]["gamesys"]+"</platform>\n\t<year>"+self.launchers[launcher]["roms"][rom]["release"]+"</year>\n\t<publisher>"+self.launchers[launcher]["roms"][rom]["studio"]+"</publisher>\n\t<genre>"+self.launchers[launcher]["roms"][rom]["genre"]+"</genre>\n\t<plot>"+self.launchers[launcher]["roms"][rom]["plot"]+"</plot>\n</game>\n"
             usock = open( nfo_file, 'w' )
-            usock.write("<game>\n")
-            usock.write("\t<title>"+self.launchers[launcher]["roms"][rom]["name"]+"</title>\n")
-            usock.write("\t<platform>"+self.launchers[launcher]["roms"][rom]["gamesys"]+"</platform>\n")
-            usock.write("\t<year>"+self.launchers[launcher]["roms"][rom]["release"]+"</year>\n")
-            usock.write("\t<publisher>"+self.launchers[launcher]["roms"][rom]["studio"]+"</publisher>\n")
-            usock.write("\t<genre>"+self.launchers[launcher]["roms"][rom]["genre"]+"</genre>\n")
-            usock.write("\t<plot>"+self.launchers[launcher]["roms"][rom]["plot"]+"</plot>\n")
-            usock.write("</game>\n")
+            usock.write(nfo_content)
             usock.close()
             xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30086 ) % os.path.basename(nfo_file).encode('utf8','ignore')))
 
@@ -1530,15 +1481,9 @@ class Main:
             os.remove(nfo_file+".tmp")
             xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30087 ) % os.path.basename(nfo_file)))
         else:
+            nfo_content = "<launcher>\n\t<title>"+self.launchers[launcherID]["name"]+"</title>\n\t<platform>"+self.launchers[launcherID]["gamesys"]+"</platform>\n\t<year>"+self.launchers[launcherID]["release"]+"</year>\n\t<publisher>"+self.launchers[launcherID]["studio"]+"</publisher>\n\t<genre>"+self.launchers[launcherID]["genre"]+"</genre>\n\t<plot>"+self.launchers[launcherID]["plot"]+"</plot>\n</launcher>\n"
             usock = open( nfo_file, 'w' )
-            usock.write("<game>\n")
-            usock.write("\t<title>"+self.launchers[launcherID]["name"]+"</title>\n")
-            usock.write("\t<platform>"+self.launchers[launcherID]["gamesys"]+"</platform>\n")
-            usock.write("\t<year>"+self.launchers[launcherID]["release"]+"</year>\n")
-            usock.write("\t<publisher>"+self.launchers[launcherID]["studio"]+"</publisher>\n")
-            usock.write("\t<genre>"+self.launchers[launcherID]["genre"]+"</genre>\n")
-            usock.write("\t<plot>"+self.launchers[launcherID]["plot"]+"</plot>\n")
-            usock.write("</game>\n")
+            usock.write(nfo_content)
             usock.close()
             xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30086 ) % os.path.basename(nfo_file)))
 
@@ -1858,9 +1803,6 @@ class Main:
 
     def _save_launchers (self):
         xbmc.executebuiltin( "ActivateWindow(busydialog)" )
-        # Create add-on userdata directory if do not exist
-        if (not os.path.isdir(PLUGIN_DATA_PATH)):
-            os.makedirs(PLUGIN_DATA_PATH)
         if ( self.settings[ "auto_backup" ] ):
             # Delete oldest backup file
             fileData = {}
@@ -2286,7 +2228,7 @@ class Main:
                                             img_url = self._get_thumbnail(self.image_url)
                                             ret = pDialog.create(__language__( 30000 ), __language__( 30014 ) % (path))
                                             pDialog.update(filesCount * 100 / len(files), __language__( 30061 ) % (f.replace("."+f.split(".")[-1],""),self.settings[ "datas_scraper" ].encode('utf-8','ignore')))
-                                    cached_thumb = thumbnails.get_cached_covers_thumb( thumb ).replace("tbn" , "jpg")
+                                    cached_thumb = Thumbnails().get_cached_covers_thumb( thumb ).replace("tbn" , "jpg")
                                     if ( img_url !='' ):
                                         try:
                                             download_img(img_url,thumb)
@@ -2341,7 +2283,7 @@ class Main:
                                             img_url = self._get_fanart(self.image_url)
                                             ret = pDialog.create(__language__( 30000 ), __language__( 30014 ) % (path))
                                             pDialog.update(filesCount * 100 / len(files), __language__( 30061 ) % (f.replace("."+f.split(".")[-1],""),self.settings[ "datas_scraper" ].encode('utf-8','ignore')))
-                                    cached_thumb = thumbnails.get_cached_covers_thumb( fanart ).replace("tbn" , "jpg")
+                                    cached_thumb = Thumbnails().get_cached_covers_thumb( fanart ).replace("tbn" , "jpg")
                                     if ( img_url !='' ):
                                         try:
                                             download_img(img_url,fanart)
@@ -2468,7 +2410,6 @@ class Main:
         commands.append((__language__( 30512 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, SEARCH_COMMAND) , ))
         commands.append(( __language__( 30107 ), "XBMC.RunPlugin(%s?%s/%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, key, EDIT_COMMAND) , ))
         if search :
-            print search_url
             commands.append((__language__( 30513 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, SEARCH_COMMAND) , ))
         listitem.addContextMenuItems( commands )
         if ( finished == "false" ) or ( self.settings[ "hide_finished" ] == False) :
@@ -2873,7 +2814,7 @@ def MyDialog(img_list):
     del w
     
 def _update_cache(file_path):
-    cached_thumb = thumbnails.get_cached_covers_thumb( file_path ).replace("tbn" , os.path.splitext(file_path)[-1][1:4])
+    cached_thumb = Thumbnails().get_cached_covers_thumb( file_path ).replace("tbn" , os.path.splitext(file_path)[-1][1:4])
     try:
         shutil.copy2( file_path.decode(sys.getfilesystemencoding(),'ignore') , cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
     except OSError:
