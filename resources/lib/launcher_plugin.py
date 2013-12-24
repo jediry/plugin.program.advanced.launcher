@@ -26,7 +26,6 @@ import math
 import re
 import urllib, urllib2
 import subprocess_hack
-import xml.dom.minidom
 import socket
 import exceptions
 
@@ -70,6 +69,7 @@ DEFAULT_NFO_PATH = os.path.join( PLUGIN_DATA_PATH , "nfos" )
 if not os.path.exists(DEFAULT_NFO_PATH): os.makedirs(DEFAULT_NFO_PATH)
 DEFAULT_BACKUP_PATH = os.path.join( PLUGIN_DATA_PATH , "backups" )
 if not os.path.exists(DEFAULT_BACKUP_PATH): os.makedirs(DEFAULT_BACKUP_PATH)
+
 
 REMOVE_COMMAND = "%%REMOVE%%"
 BACKUP_COMMAND = "%%BACKUP%%"
@@ -1858,11 +1858,11 @@ class Main:
 
     def _save_launchers (self):
         xbmc.executebuiltin( "ActivateWindow(busydialog)" )
-        # make settings directory if doesn't exists
-        if (not os.path.isdir(os.path.dirname(TEMP_CURRENT_SOURCE_PATH))):
-            os.makedirs(os.path.dirname(TEMP_CURRENT_SOURCE_PATH))
+        # Create add-on userdata directory if do not exist
+        if (not os.path.isdir(PLUGIN_DATA_PATH)):
+            os.makedirs(PLUGIN_DATA_PATH)
         if ( self.settings[ "auto_backup" ] ):
-            # delete old backup files
+            # Delete oldest backup file
             fileData = {}
             dirList=os.listdir(DEFAULT_BACKUP_PATH)
             for fname in dirList:
@@ -1871,7 +1871,7 @@ class Main:
             delete = len(sortedFiles) - self.settings[ "nb_backup_files" ] + 1
             for x in range(0, delete):
                 os.remove(os.path.join( DEFAULT_BACKUP_PATH,sortedFiles[x][0]))
-            # make current launchers.xml backup
+            # Make a backup of current launchers.xml file
             if ( os.path.isfile(BASE_CURRENT_SOURCE_PATH)):
                 try:
                     now = datetime.datetime.now()
@@ -1881,77 +1881,32 @@ class Main:
                 except OSError:
                     xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30600 )))
         try:
-            usock = open( TEMP_CURRENT_SOURCE_PATH, 'w' )
-            usock.write("<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n")
-            usock.write("<advanced_launcher version=\"1.0\">\n")
+            xml_content = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<advanced_launcher version=\"1.0\">\n\t<categories>\n"
             # Create Categories XML list
-            usock.write("\t<categories>\n")
             for categoryIndex in sorted(self.categories, key= lambda x : self.categories[x]["name"]):
                 category = self.categories[categoryIndex]
-                usock.write("\t\t<category>\n")
-                usock.write("\t\t\t<id>"+categoryIndex+"</id>\n")
-                usock.write("\t\t\t<name>"+category["name"]+"</name>\n")
-                usock.write("\t\t\t<thumb>"+category["thumb"]+"</thumb>\n")
-                usock.write("\t\t\t<fanart>"+category["fanart"]+"</fanart>\n")
-                usock.write("\t\t\t<genre>"+category["genre"]+"</genre>\n")
-                usock.write("\t\t\t<description>"+category["plot"]+"</description>\n")
-                usock.write("\t\t</category>\n")
-            usock.write("\t</categories>\n")
+                xml_content += "\t\t<category>\n\t\t\t<id>"+categoryIndex+"</id>\n\t\t\t<name>"+category["name"]+"</name>\n\t\t\t<thumb>"+category["thumb"]+"</thumb>\n\t\t\t<fanart>"+category["fanart"]+"</fanart>\n\t\t\t<genre>"+category["genre"]+"</genre>\n\t\t\t<description>"+category["plot"]+"</description>\n\t\t</category>\n"
+            xml_content += "\t</categories>\n\t<launchers>\n"
             # Create Launchers XML list
-            usock.write("\t<launchers>\n")
             for launcherIndex in sorted(self.launchers, key= lambda x : self.launchers[x]["name"]):
                 launcher = self.launchers[launcherIndex]
-                usock.write("\t\t<launcher>\n")
-                usock.write("\t\t\t<id>"+launcherIndex+"</id>\n")
-                usock.write("\t\t\t<name>"+launcher["name"]+"</name>\n")
-                usock.write("\t\t\t<category>"+launcher["category"]+"</category>\n")
-                usock.write("\t\t\t<application>"+launcher["application"]+"</application>\n")
-                usock.write("\t\t\t<args>"+launcher["args"]+"</args>\n")
-                usock.write("\t\t\t<rompath>"+launcher["rompath"]+"</rompath>\n")
-                usock.write("\t\t\t<thumbpath>"+launcher["thumbpath"]+"</thumbpath>\n")
-                usock.write("\t\t\t<fanartpath>"+launcher["fanartpath"]+"</fanartpath>\n")
-                usock.write("\t\t\t<trailerpath>"+launcher["trailerpath"]+"</trailerpath>\n")
-                usock.write("\t\t\t<custompath>"+launcher["custompath"]+"</custompath>\n")
-                usock.write("\t\t\t<romext>"+launcher["romext"]+"</romext>\n")
-                usock.write("\t\t\t<platform>"+launcher["gamesys"]+"</platform>\n")
-                usock.write("\t\t\t<thumb>"+launcher["thumb"]+"</thumb>\n")
-                usock.write("\t\t\t<fanart>"+launcher["fanart"]+"</fanart>\n")
-                usock.write("\t\t\t<genre>"+launcher["genre"]+"</genre>\n")
-                usock.write("\t\t\t<release>"+launcher["release"]+"</release>\n")
-                usock.write("\t\t\t<publisher>"+launcher["studio"]+"</publisher>\n")
-                usock.write("\t\t\t<launcherplot>"+launcher["plot"]+"</launcherplot>\n")
-                usock.write("\t\t\t<finished>"+launcher["finished"]+"</finished>\n")
-                usock.write("\t\t\t<minimize>"+launcher["minimize"]+"</minimize>\n")
-                usock.write("\t\t\t<lnk>"+launcher["lnk"]+"</lnk>\n")
+                xml_content += "\t\t<launcher>\n\t\t\t<id>"+launcherIndex+"</id>\n\t\t\t<name>"+launcher["name"]+"</name>\n\t\t\t<category>"+launcher["category"]+"</category>\n\t\t\t<application>"+launcher["application"]+"</application>\n\t\t\t<args>"+launcher["args"]+"</args>\n\t\t\t<rompath>"+launcher["rompath"]+"</rompath>\n\t\t\t<thumbpath>"+launcher["thumbpath"]+"</thumbpath>\n\t\t\t<fanartpath>"+launcher["fanartpath"]+"</fanartpath>\n\t\t\t<trailerpath>"+launcher["trailerpath"]+"</trailerpath>\n\t\t\t<custompath>"+launcher["custompath"]+"</custompath>\n\t\t\t<romext>"+launcher["romext"]+"</romext>\n\t\t\t<platform>"+launcher["gamesys"]+"</platform>\n\t\t\t<thumb>"+launcher["thumb"]+"</thumb>\n\t\t\t<fanart>"+launcher["fanart"]+"</fanart>\n\t\t\t<genre>"+launcher["genre"]+"</genre>\n\t\t\t<release>"+launcher["release"]+"</release>\n\t\t\t<publisher>"+launcher["studio"]+"</publisher>\n\t\t\t<launcherplot>"+launcher["plot"]+"</launcherplot>\n\t\t\t<finished>"+launcher["finished"]+"</finished>\n\t\t\t<minimize>"+launcher["minimize"]+"</minimize>\n\t\t\t<lnk>"+launcher["lnk"]+"</lnk>\n\t\t\t<roms>\n"
                 # Create Items XML list
-                usock.write("\t\t\t<roms>\n")
                 for romIndex in sorted(launcher["roms"], key= lambda x : launcher["roms"][x]["name"]):
                     romdata = launcher["roms"][romIndex]
-                    usock.write("\t\t\t\t<rom>\n")
-                    usock.write("\t\t\t\t\t<id>"+romIndex+"</id>\n")
-                    usock.write("\t\t\t\t\t<name>"+romdata["name"]+"</name>\n")
-                    usock.write("\t\t\t\t\t<filename>"+romdata["filename"]+"</filename>\n")
-                    usock.write("\t\t\t\t\t<thumb>"+romdata["thumb"]+"</thumb>\n")
-                    usock.write("\t\t\t\t\t<fanart>"+romdata["fanart"]+"</fanart>\n")
-                    usock.write("\t\t\t\t\t<trailer>"+romdata["trailer"]+"</trailer>\n")
-                    usock.write("\t\t\t\t\t<custom>"+romdata["custom"]+"</custom>\n")
-                    usock.write("\t\t\t\t\t<genre>"+romdata["genre"]+"</genre>\n")
-                    usock.write("\t\t\t\t\t<release>"+romdata["release"]+"</release>\n")
-                    usock.write("\t\t\t\t\t<publisher>"+romdata["studio"]+"</publisher>\n")
-                    usock.write("\t\t\t\t\t<gameplot>"+romdata["plot"]+"</gameplot>\n")
-                    usock.write("\t\t\t\t\t<finished>"+romdata["finished"]+"</finished>\n")
-                    usock.write("\t\t\t\t\t<altapp>"+romdata["altapp"]+"</altapp>\n")
-                    usock.write("\t\t\t\t\t<altarg>"+romdata["altarg"]+"</altarg>\n")
-                    usock.write("\t\t\t\t</rom>\n")
-                usock.write("\t\t\t</roms>\n")
-                usock.write("\t\t</launcher>\n")
-            usock.write("\t</launchers>\n")
-            usock.write("</advanced_launcher>")
+                    xml_content += "\t\t\t\t<rom>\n\t\t\t\t\t<id>"+romIndex+"</id>\n\t\t\t\t\t<name>"+romdata["name"]+"</name>\n\t\t\t\t\t<filename>"+romdata["filename"]+"</filename>\n\t\t\t\t\t<thumb>"+romdata["thumb"]+"</thumb>\n\t\t\t\t\t<fanart>"+romdata["fanart"]+"</fanart>\n\t\t\t\t\t<trailer>"+romdata["trailer"]+"</trailer>\n\t\t\t\t\t<custom>"+romdata["custom"]+"</custom>\n\t\t\t\t\t<genre>"+romdata["genre"]+"</genre>\n\t\t\t\t\t<release>"+romdata["release"]+"</release>\n\t\t\t\t\t<publisher>"+romdata["studio"]+"</publisher>\n\t\t\t\t\t<gameplot>"+romdata["plot"]+"</gameplot>\n\t\t\t\t\t<finished>"+romdata["finished"]+"</finished>\n\t\t\t\t\t<altapp>"+romdata["altapp"]+"</altapp>\n\t\t\t\t\t<altarg>"+romdata["altarg"]+"</altarg>\n\t\t\t\t</rom>\n"
+                xml_content += "\t\t\t</roms>\n\t\t</launcher>\n"
+            xml_content += "\t</launchers>\n</advanced_launcher>"
+
+            # Save launchers.tmp file
+            usock = open( TEMP_CURRENT_SOURCE_PATH, 'w' )
+            usock.write(xml_content)
             usock.close()
             try:
                 shutil.copy2(TEMP_CURRENT_SOURCE_PATH, BASE_CURRENT_SOURCE_PATH)
             except OSError:
                 xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30601 )))
+
         except OSError:
             xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30602 )))
         except IOError:
@@ -1968,227 +1923,50 @@ class Main:
         os.remove(MERGED_SOURCE_PATH)
         xbmc.executebuiltin("Container.Refresh")
 
-    ''' read the list of categories, launchers and roms from launchers.xml file '''
     def _load_launchers(self, xmlSource):
-        need_update = 0
         # clean, save and return the xml string
-        xmlSource = xmlSource.replace("&amp;", "&")
-
-        categories = re.findall( "<category>(.*?)</category>", xmlSource )
-        
-        if len(categories) > 0 :
+        xmlSource = xmlSource.replace("&amp;", "&").replace('\r','').replace('\n','').replace('\t','')
+        # Get categories list from XML source
+        xml_categories = re.findall( "<categories>(.*?)</categories>", xmlSource )
+        # If categories exist ()...
+        if len(xml_categories) > 0 :
+            categories = re.findall( "<category>(.*?)</category>", xml_categories[0] )
             for category in categories:
-                categoryid = re.findall( "<id>(.*?)</id>", category )
-                categoryname = re.findall( "<name>(.*?)</name>", category )
-                categorythumb = re.findall( "<thumb>(.*?)</thumb>", category )
-                categoryfanart = re.findall( "<fanart>(.*?)</fanart>", category )
-                categorygenre = re.findall( "<genre>(.*?)</genre>", category )
-                categoryplot = re.findall( "<description>(.*?)</description>", category )
-
-                if len(categoryid) > 0 : categoryid = categoryid[0]
-                else: categoryid = "default"
-                if len(categoryname) > 0 : categoryname = categoryname[0]
-                else: categoryname = "Default"
-                if len(categorythumb) > 0: categorythumb = categorythumb[0]
-                else: categorythumb = ""
-                if len(categoryfanart) > 0: categoryfanart = categoryfanart[0]
-                else: categoryfanart = ""
-                if len(categorygenre) > 0: categorygenre = categorygenre[0]
-                else: categorygenre = ""
-                if len(categoryplot) > 0: categoryplot = categoryplot[0]
-                else: categoryplot = ""
-
                 categorydata = {}
-                categorydata["id"] = categoryid
-                categorydata["name"] = categoryname
-                categorydata["thumb"] = categorythumb
-                categorydata["fanart"] = categoryfanart
-                categorydata["genre"] = categorygenre
-                categorydata["plot"] = categoryplot
-                self.categories[categoryid] = categorydata
+                category_index = ["id","name","thumb","fanart","genre","plot"]
+                values = re.findall( "<id>(.*?)</id><name>(.*?)</name><thumb>(.*?)</thumb><fanart>(.*?)</fanart><genre>(.*?)</genre><description>(.*?)</description>", category)
+                for index, n in enumerate(category_index):
+                    categorydata[n] = values[0][index]
+                self.categories[categorydata["id"]] = categorydata
+        # Else create the default category
         else:
-            categorydata = {}
-            categorydata["id"] = "default"
-            categorydata["name"] = "Default"
-            categorydata["thumb"] = ""
-            categorydata["fanart"] = ""
-            categorydata["genre"] = ""
-            categorydata["plot"] = ""
-            self.categories["default"] = categorydata
-
-        launchers = re.findall( "<launcher>(.*?)</launcher>", xmlSource )
-        for launcher in launchers:
-            launcherid = re.findall( "<id>(.*?)</id>", launcher )
-            name = re.findall( "<name>(.*?)</name>", launcher )
-            category = re.findall( "<category>(.*?)</category>", launcher )
-            application = re.findall( "<application>(.*?)</application>", launcher )
-            args = re.findall( "<args>(.*?)</args>", launcher )
-            rompath = re.findall( "<rompath>(.*?)</rompath>", launcher )
-            thumbpath = re.findall( "<thumbpath>(.*?)</thumbpath>", launcher )
-            fanartpath = re.findall( "<fanartpath>(.*?)</fanartpath>", launcher )
-            trailerpath = re.findall( "<trailerpath>(.*?)</trailerpath>", launcher )
-            custompath = re.findall( "<custompath>(.*?)</custompath>", launcher )
-            romext = re.findall( "<romext>(.*?)</romext>", launcher )
-            gamesys = re.findall( "<platform>(.*?)</platform>", launcher )
-            thumb = re.findall( "<thumb>(.*?)</thumb>", launcher )
-            fanart = re.findall( "<fanart>(.*?)</fanart>", launcher )
-            genre = re.findall( "<genre>(.*?)</genre>", launcher )
-            release = re.findall( "<release>(.*?)</release>", launcher )
-            studio = re.findall( "<publisher>(.*?)</publisher>", launcher )
-            plot = re.findall( "<launcherplot>(.*?)</launcherplot>", launcher )
-            lnk = re.findall( "<lnk>(.*?)</lnk>", launcher )
-            finished = re.findall( "<finished>(.*?)</finished>", launcher )
-            minimize = re.findall( "<minimize>(.*?)</minimize>", launcher )
-            romsxml = re.findall( "<rom>(.*?)</rom>", launcher )
-
-            if len(launcherid) > 0 : launcherid = launcherid[0]
-            else:
-                launcherid = _get_SID()
-                need_update = 1
-            # replace comma by single low-9 quotation mark
-            if len(name) > 0 : name = name[0]
-            else: name = "unknown"
-            if len(category) > 0 : category = category[0]
-            else: category = "default"
-            if len(application) > 0 : application = application[0]
-            else: application = ""
-            if len(args) > 0 : args = args[0]
-            else: args = ""
-            if len(rompath) > 0 : rompath = rompath[0]
-            else: rompath = ""
-            if len(thumbpath) > 0 : thumbpath = thumbpath[0]
-            else: thumbpath = ""
-            if len(fanartpath) > 0 : fanartpath = fanartpath[0]
-            else: fanartpath = ""
-            if len(trailerpath) > 0 : trailerpath = trailerpath[0]
-            else: trailerpath = ""
-            if len(custompath) > 0 : custompath = custompath[0]
-            else: custompath = ""
-            if len(romext) > 0: romext = romext[0]
-            else: romext = ""
-            if len(gamesys) > 0: gamesys = gamesys[0]
-            else: gamesys = ""
-            if len(thumb) > 0: thumb = thumb[0]
-            else: thumb = ""
-            if len(fanart) > 0: fanart = fanart[0]
-            else: fanart = ""
-            if len(genre) > 0: genre = genre[0]
-            else: genre = ""
-            if len(release) > 0: release = release[0]
-            else: release = ""
-            if len(studio) > 0: studio = studio[0]
-            else: studio = ""
-            if len(plot) > 0: plot = plot[0]
-            else: plot = ""
-            if len(finished) > 0: finished = finished[0]
-            else: finished = "false"
-            if len(lnk) > 0: lnk = lnk[0]
-            else:
-                if (sys.platform == 'win32'):
-                    lnk = "true"
-                else:
-                    lnk = ""
-            if len(minimize) > 0: minimize = minimize[0]
-            else: minimize = "false"
-
-            roms = {}
-            for rom in romsxml:
-                romid = re.findall( "<id>(.*?)</id>", rom )
-                romname = re.findall( "<name>(.*?)</name>", rom )
-                romfilename = re.findall( "<filename>(.*?)</filename>", rom )
-                romthumb = re.findall( "<thumb>(.*?)</thumb>", rom )
-                romfanart = re.findall( "<fanart>(.*?)</fanart>", rom )
-                romtrailer = re.findall( "<trailer>(.*?)</trailer>", rom )
-                romcustom = re.findall( "<custom>(.*?)</custom>", rom )
-                romgenre = re.findall( "<genre>(.*?)</genre>", rom )
-                romrelease = re.findall( "<release>(.*?)</release>", rom )
-                romstudio = re.findall( "<publisher>(.*?)</publisher>", rom )
-                romplot = re.findall( "<gameplot>(.*?)</gameplot>", rom )
-                romfinished = re.findall( "<finished>(.*?)</finished>", rom )
-                romaltapp = re.findall( "<altapp>(.*?)</altapp>", rom )
-                romaltarg = re.findall( "<altarg>(.*?)</altarg>", rom )
-                romgamesys = gamesys
-
-                if len(romid) > 0 : romid = romid[0]
-                else:
-                    romid = _get_SID()
-                    need_update = 1
-                if len(romname) > 0 : romname = romname[0]
-                else: romname = "unknown"
-                if len(romfilename) > 0 : romfilename = romfilename[0]
-                else: romfilename = ""
-                if len(romthumb) > 0 : romthumb = romthumb[0]
-                else: romthumb = ""
-                if len(romfanart) > 0 : romfanart = romfanart[0]
-                else: romfanart = ""
-                if len(romtrailer) > 0 : romtrailer = romtrailer[0]
-                else: romtrailer = ""
-                if len(romcustom) > 0 : romcustom = romcustom[0]
-                else: romcustom = ""
-                if len(romgenre) > 0 : romgenre = romgenre[0]
-                else: romgenre = ""
-                if len(romrelease) > 0 : romrelease = romrelease[0]
-                else: romrelease = ""
-                if len(romstudio) > 0 : romstudio = romstudio[0]
-                else: romstudio = ""
-                if len(romplot) > 0 : romplot = romplot[0]
-                else: romplot = ""
-                if len(romfinished) > 0 : romfinished = romfinished[0]
-                else: romfinished = "false"
-                if len(romaltapp) > 0 : romaltapp = romaltapp[0]
-                else: romaltapp = ""
-                if len(romaltarg) > 0 : romaltarg = romaltarg[0]
-                else: romaltarg = ""
-
-                # prepare rom object data
-                romdata = {}
-                romdata["name"] = romname
-                romdata["filename"] = romfilename
-                romdata["gamesys"] = romgamesys
-                romdata["thumb"] = romthumb
-                romdata["fanart"] = romfanart
-                romdata["trailer"] = romtrailer
-                romdata["custom"] = romcustom
-                romdata["genre"] = romgenre
-                romdata["release"] = romrelease
-                romdata["studio"] = romstudio
-                romdata["plot"] = romplot
-                romdata["finished"] = romfinished
-                romdata["altapp"] = romaltapp
-                romdata["altarg"] = romaltarg
-
-                # add rom to the roms list (using id as index)
-                roms[romid] = romdata
-
-            # prepare launcher object data
-            launcherdata = {}
-            launcherdata["name"] = name
-            launcherdata["category"] = category
-            launcherdata["application"] = application
-            launcherdata["args"] = args
-            launcherdata["rompath"] = rompath
-            launcherdata["thumbpath"] = thumbpath
-            launcherdata["fanartpath"] = fanartpath
-            launcherdata["trailerpath"] = trailerpath
-            launcherdata["custompath"] = custompath
-            launcherdata["romext"] = romext
-            launcherdata["gamesys"] = gamesys
-            launcherdata["thumb"] = thumb
-            launcherdata["fanart"] = fanart
-            launcherdata["genre"] = genre
-            launcherdata["release"] = release
-            launcherdata["studio"] = studio
-            launcherdata["plot"] = plot
-            launcherdata["finished"] = finished
-            launcherdata["lnk"] = lnk
-            launcherdata["minimize"] = minimize
-            launcherdata["roms"] = roms
-
-            # add launcher to the launchers list (using id as index)
-            self.launchers[launcherid] = launcherdata
-
-        if ( need_update == 1 ):
-            self._save_launchers()
+            self.categories["default"] = {"id":"default", "name":"Default", "thumb":"", "fanart":"", "genre":"", "plot":""}
+        # Get launchers list from XML source
+        xml_launchers = re.findall( "<launchers>(.*?)</launchers>", xmlSource )
+        # If launchers exist ()...
+        if len(xml_launchers) > 0 :
+            launchers = re.findall( "<launcher>(.*?)</launcher>", xml_launchers[0] )
+            for launcher in launchers:
+                launcherdata = {}
+                launcher_index = ["id","name","category","application","args","rompath","thumbpath","fanartpath","trailerpath","custompath","romext","gamesys","thumb","fanart","genre","release","studio","plot","lnk","finished","minimize","roms"]        
+                values = re.findall( "<id>(.*?)</id><name>(.*?)</name><category>(.*?)</category><application>(.*?)</application><args>(.*?)</args><rompath>(.*?)</rompath><thumbpath>(.*?)</thumbpath><fanartpath>(.*?)</fanartpath><trailerpath>(.*?)</trailerpath><custompath>(.*?)</custompath><romext>(.*?)</romext><platform>(.*?)</platform><thumb>(.*?)</thumb><fanart>(.*?)</fanart><genre>(.*?)</genre><release>(.*?)</release><publisher>(.*?)</publisher><launcherplot>(.*?)</launcherplot><finished>(.*?)</finished><minimize>(.*?)</minimize><lnk>(.*?)</lnk><roms>(.*?)</roms>", launcher)
+                for index, n in enumerate(launcher_index):
+                    launcherdata[n] = values[0][index]
+                # Get roms list from XML source
+                roms = re.findall( "<rom>(.*?)</rom>", launcherdata["roms"] )
+                roms_list = {}
+                # If roms exist...
+                if len(roms) > 0 :
+                    for rom in roms:
+                        romdata = {}
+                        rom_index = ["id","name","filename","thumb","fanart","trailer","custom","genre","release","studio","plot","finished","altapp","altarg"]        
+                        r_values = re.findall( "<id>(.*?)</id><name>(.*?)</name><filename>(.*?)</filename><thumb>(.*?)</thumb><fanart>(.*?)</fanart><trailer>(.*?)</trailer><custom>(.*?)</custom><genre>(.*?)</genre><release>(.*?)</release><publisher>(.*?)</publisher><gameplot>(.*?)</gameplot><finished>(.*?)</finished><altapp>(.*?)</altapp><altarg>(.*?)</altarg>", rom)
+                        for r_index, r_n in enumerate(rom_index):
+                            romdata[r_n] = r_values[0][r_index]
+                        romdata["gamesys"] = launcherdata["gamesys"]
+                        roms_list[romdata["id"]] = romdata
+                launcherdata["roms"] = roms_list
+                self.launchers[launcherdata["id"]] = launcherdata
 
     def _get_categories( self ):
         for key in sorted(self.categories, key= lambda x : self.categories[x]["name"]):
@@ -2803,7 +2581,7 @@ class Main:
             self.categories[categoryid] = categorydata
             self._save_launchers()
             xbmc.executebuiltin("Container.Refresh")
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30113 ) % categorydata["name"] ))
+            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30113 ) % categorydata["name"]))
             return True
         else:
             return False

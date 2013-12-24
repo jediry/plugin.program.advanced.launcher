@@ -1,3 +1,7 @@
+[B]2.2.0[/B]
+. Rewrite launchers.xml load/save functions.
+. Change python dependence to version 2.1.
+
 [B]2.1.0[/B]
 . Add an option to directly open Advanced Launcher into default category.
 . Update launchers.xml file format.
