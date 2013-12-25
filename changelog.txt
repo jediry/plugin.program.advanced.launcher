@@ -1,4 +1,5 @@
 [B]2.2.0[/B]
+. Fix XBMC notification icon display.
 . Rewrite launchers.xml load/save functions.
 . Code cleaning.
 . Change python dependence to version 2.1.

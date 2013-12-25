@@ -32,16 +32,20 @@ except:
     import md5
 
 # Addon paths definition
-PLUGIN_DATA_PATH = xbmc.translatePath( os.path.join( "special://profile/addon_data", "plugin.program.advanced.launcher") )
-BASE_PATH = xbmc.translatePath( os.path.join( "special://" , "profile" ) )
-BASE_CURRENT_SOURCE_PATH = os.path.join( PLUGIN_DATA_PATH , "launchers.xml" )
-TEMP_CURRENT_SOURCE_PATH = os.path.join( PLUGIN_DATA_PATH , "launchers.tmp" )
-MERGED_SOURCE_PATH = os.path.join(PLUGIN_DATA_PATH , "merged-launchers.xml" )
-DEFAULT_THUMB_PATH = os.path.join( PLUGIN_DATA_PATH , "thumbs" )
-DEFAULT_FANART_PATH = os.path.join( PLUGIN_DATA_PATH , "fanarts" )
-DEFAULT_NFO_PATH = os.path.join( PLUGIN_DATA_PATH , "nfos" )
-DEFAULT_BACKUP_PATH = os.path.join( PLUGIN_DATA_PATH , "backups" )
-SHORTCUT_FILE = os.path.join( PLUGIN_DATA_PATH , "shortcut.cut" )
+PLUGIN_DATA_PATH = xbmc.translatePath(os.path.join("special://profile/addon_data","plugin.program.advanced.launcher"))
+BASE_PATH = xbmc.translatePath(os.path.join("special://","profile"))
+HOME_PATH = xbmc.translatePath(os.path.join("special://","home"))
+ADDONS_PATH = xbmc.translatePath(os.path.join(HOME_PATH,"addons"))
+CURRENT_ADDON_PATH = xbmc.translatePath(os.path.join(ADDONS_PATH,"plugin.program.advanced.launcher"))
+BASE_CURRENT_SOURCE_PATH = os.path.join(PLUGIN_DATA_PATH,"launchers.xml")
+TEMP_CURRENT_SOURCE_PATH = os.path.join(PLUGIN_DATA_PATH,"launchers.tmp")
+MERGED_SOURCE_PATH = os.path.join(PLUGIN_DATA_PATH,"merged-launchers.xml")
+DEFAULT_THUMB_PATH = os.path.join(PLUGIN_DATA_PATH,"thumbs")
+DEFAULT_FANART_PATH = os.path.join(PLUGIN_DATA_PATH,"fanarts")
+DEFAULT_NFO_PATH = os.path.join(PLUGIN_DATA_PATH,"nfos")
+DEFAULT_BACKUP_PATH = os.path.join(PLUGIN_DATA_PATH,"backups")
+SHORTCUT_FILE = os.path.join(PLUGIN_DATA_PATH,"shortcut.cut")
+ICON_IMG_FILE = os.path.join(CURRENT_ADDON_PATH,"icon.png")
 
 # Addon paths creation
 if not os.path.exists(DEFAULT_THUMB_PATH): os.makedirs(DEFAULT_THUMB_PATH)
@@ -78,6 +82,8 @@ def __language__(string):
 
 # Main code
 
+print ICON_IMG_FILE
+
 class Main:
     launchers = {}
     categories = {}
@@ -112,10 +118,12 @@ class Main:
         xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_GENRE)
         xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_UNSORTED)
 
+        # If parameters are passed...
         if param:
             param = param[1:]
             command = param.split(COMMAND_ARGS_SEPARATOR)
             command_part = command[0].replace("%2f","/").split("/")
+
             # check the action needed
             if ( len(command_part) == 4 ):
                 category = command_part[0]
@@ -181,7 +189,6 @@ class Main:
                     self._add_new_launcher(category)
                     
                 # Search commands
-
                 elif (launcher == SEARCH_ITEM_COMMAND):
                     self._find_add_roms(category)
                 elif (launcher == SEARCH_DATE_COMMAND):
@@ -225,6 +232,7 @@ class Main:
                     self._add_new_launcher(category)
                 else:
                     self._get_launchers(category)
+
         else:
             self._print_log(__language__( 30739 ))
             if (len(self.categories) == 0):
@@ -399,9 +407,9 @@ class Main:
                                     self.launchers[launcher]["roms"][rom]["thumb"] = file_path
                                     self._save_launchers()
                                     _update_cache(file_path)
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
                                 except OSError:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30063 ) % self.launchers[launcher]["roms"][rom]["name"]))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30063 ) % self.launchers[launcher]["roms"][rom]["name"],3000)
 
             if (type2 == 2 ):
                 # Link to a rom thumbnail image
@@ -415,7 +423,7 @@ class Main:
                         self.launchers[launcher]["roms"][rom]["thumb"] = image
                         self._save_launchers()
                         _update_cache(image)
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                        xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
 
         if (type == 3 ):
             dialog = xbmcgui.Dialog()
@@ -449,9 +457,9 @@ class Main:
                                     self.launchers[launcher]["roms"][rom]["fanart"] = file_path
                                     self._save_launchers()
                                     _update_cache(file_path)
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
                                 except OSError:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30064 ) % self.launchers[launcher]["roms"][rom]["name"]))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30064 ) % self.launchers[launcher]["roms"][rom]["name"],3000)
             if (type2 == 2 ):
                 # Link to a rom fanart image
                 if (self.launchers[launcher]["roms"][rom]["fanart"] == ""):
@@ -464,7 +472,7 @@ class Main:
                         self.launchers[launcher]["roms"][rom]["fanart"] = image
                         self._save_launchers()
                         _update_cache(image)
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                        xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
 
         if (type == 4 ):
             if (self.launchers[launcher]["roms"][rom]["finished"] == "false"):
@@ -518,13 +526,13 @@ class Main:
         xbmc.executebuiltin("Container.Refresh")
 
     def _scrap_thumb_rom_algo(self, launcher, rom, title):
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30065 ) % (self.launchers[launcher]["roms"][rom]["name"],(self.settings[ "thumbs_scraper" ]).encode('utf-8','ignore'))))
+        xbmc_notify(__language__( 30000 ), __language__( 30065 ) % (self.launchers[launcher]["roms"][rom]["name"],(self.settings[ "thumbs_scraper" ]).encode('utf-8','ignore')),300000)
         xbmc.executebuiltin( "ActivateWindow(busydialog)" )
         covers = self._get_thumbnails_list(self.launchers[launcher]["roms"][rom]["gamesys"],title,self.settings["game_region"],self.settings[ "thumb_image_size" ])
         if covers:
             nb_images = len(covers)
             xbmc.executebuiltin( "Dialog.Close(busydialog)" )
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30066 ) % (nb_images,self.launchers[launcher]["roms"][rom]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30066 ) % (nb_images,self.launchers[launcher]["roms"][rom]["name"]),3000)
             covers.insert(0,(self.launchers[launcher]["roms"][rom]["thumb"],self.launchers[launcher]["roms"][rom]["thumb"],__language__( 30068 )))
             self.image_url = MyDialog(covers)
             if ( self.image_url ):
@@ -544,7 +552,7 @@ class Main:
                                     file_path = filename.replace("."+filename.split(".")[-1], img_ext)
                                 else:
                                     file_path = os.path.join(os.path.dirname(self.launchers[launcher]["thumbpath"]),os.path.basename(filename.replace("."+filename.split(".")[-1], img_ext)))
-                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30069 )))
+                            xbmc_notify(__language__( 30000 ), __language__( 30069 ),300000)
                             try:
                                 download_img(img_url,file_path)
                                 req = urllib2.Request(img_url)
@@ -556,16 +564,16 @@ class Main:
                                 self.launchers[launcher]["roms"][rom]["thumb"] = file_path
                                 self._save_launchers()
                                 _update_cache(file_path)
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
                             except socket.timeout:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30081 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30081 ),3000)
                             except exceptions.IOError:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30063 ) % self.launchers[launcher]["roms"][rom]["name"]))
+                                xbmc_notify(__language__( 30000 ), __language__( 30063 ) % self.launchers[launcher]["roms"][rom]["name"],3000)
                     else:
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcher]["roms"][rom]["name"])))
+                        xbmc_notify(__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcher]["roms"][rom]["name"]),3000)
         else:
             xbmc.executebuiltin( "Dialog.Close(busydialog)" )
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcher]["roms"][rom]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcher]["roms"][rom]["name"]),3000)
 
     def _scrap_thumb_rom(self, launcher, rom):
         if ( self.launchers[launcher]["application"].lower().find('mame') > 0 ) or ( self.settings[ "thumbs_scraper" ] == 'arcadeHITS' ):
@@ -579,11 +587,11 @@ class Main:
         xbmc.executebuiltin("Container.Update")
 
     def _scrap_thumb_launcher_algo(self, launcherID, title):
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30065 ) % (self.launchers[launcherID]["name"],(self.settings[ "thumbs_scraper" ]).encode('utf-8','ignore'))))
+        xbmc_notify(__language__( 30000 ), __language__( 30065 ) % (self.launchers[launcherID]["name"],(self.settings[ "thumbs_scraper" ]).encode('utf-8','ignore')),30000)
         covers = self._get_thumbnails_list(self.launchers[launcherID]["gamesys"],title,self.settings["game_region"],self.settings[ "thumb_image_size" ])
         if covers:
             nb_images = len(covers)
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30066 ) % (nb_images,self.launchers[launcherID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30066 ) % (nb_images,self.launchers[launcherID]["name"]),3000)
             covers.insert(0,(self.launchers[launcherID]["thumb"],self.launchers[launcherID]["thumb"],__language__( 30068 )))
             self.image_url = MyDialog(covers)
             if ( self.image_url ):
@@ -599,28 +607,28 @@ class Main:
                                 if (self.settings[ "launcher_thumb_path" ] == "" ):
                                     self.settings[ "launcher_thumb_path" ] = DEFAULT_THUMB_PATH
                                 file_path = os.path.join(self.settings[ "launcher_thumb_path" ],os.path.basename(self.launchers[launcherID]["application"])+'_thumb'+img_ext)
-                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000" % (__language__( 30000 ), __language__( 30069 )))
+                            xbmc_notify(__language__( 30000 ), __language__( 30069 ),300000)
                             try:
                                 download_img(img_url,file_path)
                                 self.launchers[launcherID]["thumb"] = file_path
                                 self._save_launchers()
                                 _update_cache(file_path)
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
                             except socket.timeout:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30081 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30081 ),3000)
                             except exceptions.IOError:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30063 ) % self.launchers[launcherID]["name"]))
+                                xbmc_notify(__language__( 30000 ), __language__( 30063 ) % self.launchers[launcherID]["name"],3000)
                     else:
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcherID]["name"])))
+                        xbmc_notify(__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcherID]["name"]),3000)
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcherID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30067 ) % (self.launchers[launcherID]["name"]),3000)
 
     def _scrap_thumb_category_algo(self, categoryID, title):
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30065 ) % (self.categories[categoryID]["name"],(self.settings[ "thumbs_scraper" ]).encode('utf-8','ignore'))))
+        xbmc_notify(__language__( 30000 ), __language__( 30065 ) % (self.categories[categoryID]["name"],(self.settings[ "thumbs_scraper" ]).encode('utf-8','ignore')),300000)
         covers = self._get_thumbnails_list("",title,"",self.settings[ "thumb_image_size" ])
         if covers:
             nb_images = len(covers)
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30066 ) % (nb_images,self.categories[categoryID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30066 ) % (nb_images,self.categories[categoryID]["name"]),3000)
             covers.insert(0,(self.categories[categoryID]["thumb"],self.categories[categoryID]["thumb"],__language__( 30068 )))
             self.image_url = MyDialog(covers)
             if ( self.image_url ):
@@ -631,21 +639,21 @@ class Main:
                         if ( img_ext != '' ):
                             filename = self.categories[categoryID]["name"]
                             file_path = os.path.join(DEFAULT_THUMB_PATH,os.path.basename(self.categories[categoryID]["name"])+'_thumb'+img_ext)
-                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000" % (__language__( 30000 ), __language__( 30069 )))
+                            xbmc_notify(__language__( 30000 ), __language__( 30069 ),300000)
                             try:
                                 download_img(img_url,file_path)
                                 self.categories[categoryID]["thumb"] = file_path
                                 self._save_launchers()
                                 _update_cache(file_path)
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
                             except socket.timeout:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30081 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30081 ),3000)
                             except exceptions.IOError:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30063 ) % self.categories[categoryID]["name"]))
+                                xbmc_notify(__language__( 30000 ), __language__( 30063 ) % self.categories[categoryID]["name"],3000)
                     else:
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30067 ) % (self.categories[categoryID]["name"])))
+                        xbmc_notify(__language__( 30000 ), __language__( 30067 ) % (self.categories[categoryID]["name"]),3000)
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30067 ) % (self.categories[categoryID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30067 ) % (self.categories[categoryID]["name"]),3000)
 
     def _scrap_thumb_launcher(self, launcherID):
         keyboard = xbmc.Keyboard(self.launchers[launcherID]["name"], __language__( 30036 ))
@@ -662,11 +670,11 @@ class Main:
         xbmc.executebuiltin("Container.Update")
 
     def _scrap_fanart_rom_algo(self, launcher, rom, title):
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30071 ) % (self.launchers[launcher]["roms"][rom]["name"],self.settings[ "fanarts_scraper" ].encode('utf-8','ignore'))))
+        xbmc_notify(__language__( 30000 ), __language__( 30071 ) % (self.launchers[launcher]["roms"][rom]["name"],self.settings[ "fanarts_scraper" ].encode('utf-8','ignore')),300000)
         full_fanarts = self._get_fanarts_list(self.launchers[launcher]["roms"][rom]["gamesys"],title,self.settings[ "fanart_image_size" ])
         if full_fanarts:
             nb_images = len(full_fanarts)
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30072 ) % (nb_images,self.launchers[launcher]["roms"][rom]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30072 ) % (nb_images,self.launchers[launcher]["roms"][rom]["name"]),3000)
             full_fanarts.insert(0,(self.launchers[launcher]["roms"][rom]["fanart"],self.launchers[launcher]["roms"][rom]["fanart"],__language__( 30068 )))
             self.image_url = MyDialog(full_fanarts)
             if ( self.image_url ):
@@ -686,28 +694,28 @@ class Main:
                                     file_path = filename.replace("."+filename.split(".")[-1], img_ext)
                                 else:
                                     file_path = os.path.join(os.path.dirname(self.launchers[launcher]["fanartpath"]),os.path.basename(filename.replace("."+filename.split(".")[-1], img_ext)))
-                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30074 )))
+                            xbmc_notify(__language__( 30000 ), __language__( 30074 ),300000)
                             try:
                                 download_img(img_url,file_path)
                                 self.launchers[launcher]["roms"][rom]["fanart"] = file_path
                                 self._save_launchers()
                                 _update_cache(file_path)
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
                             except socket.timeout:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30081 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30081 ),3000)
                             except exceptions.IOError:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30064 ) % self.launchers[launcher]["roms"][rom]["name"]))
+                                xbmc_notify(__language__( 30000 ), __language__( 30064 ) % self.launchers[launcher]["roms"][rom]["name"],3000)
                     else:
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcher]["roms"][rom]["name"])))
+                        xbmc_notify(__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcher]["roms"][rom]["name"]),3000)
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcher]["roms"][rom]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcher]["roms"][rom]["name"]),3000)
 
     def _scrap_fanart_category_algo(self, categoryID, title):
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30071 ) % (self.categories[categoryID]["name"],(self.settings[ "fanarts_scraper" ]).encode('utf-8','ignore'))))
+        xbmc_notify(__language__( 30000 ), __language__( 30071 ) % (self.categories[categoryID]["name"],(self.settings[ "fanarts_scraper" ]).encode('utf-8','ignore')),300000)
         covers = self._get_fanarts_list("",title,self.settings[ "fanart_image_size" ])
         if covers:
             nb_images = len(covers)
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30072 ) % (nb_images,self.categories[categoryID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30072 ) % (nb_images,self.categories[categoryID]["name"]),3000)
             covers.insert(0,(self.categories[categoryID]["fanart"],self.categories[categoryID]["fanart"],__language__( 30068 )))
             self.image_url = MyDialog(covers)
             if ( self.image_url ):
@@ -718,21 +726,21 @@ class Main:
                         if ( img_ext != '' ):
                             filename = self.categories[categoryID]["name"]
                             file_path = os.path.join(DEFAULT_FANART_PATH,os.path.basename(self.categories[categoryID]["name"])+'_fanart'+img_ext)
-                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000" % (__language__( 30000 ), __language__( 30074 )))
+                            xbmc_notify(__language__( 30000 ), __language__( 30074 ),300000)
                             try:
                                 download_img(img_url,file_path)
                                 self.categories[categoryID]["fanart"] = file_path
                                 self._save_launchers()
                                 _update_cache(file_path)
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
                             except socket.timeout:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30081 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30081 ),3000)
                             except exceptions.IOError:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30064 ) % self.categories[categoryID]["name"]))
+                                xbmc_notify(__language__( 30000 ), __language__( 30064 ) % self.categories[categoryID]["name"],3000)
                     else:
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30073 ) % (self.categories[categoryID]["name"])))
+                        xbmc_notify(__language__( 30000 ), __language__( 30073 ) % (self.categories[categoryID]["name"]),3000)
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30073 ) % (self.categories[categoryID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30073 ) % (self.categories[categoryID]["name"]),3000)
 
     def _scrap_fanart_rom(self, launcher, rom):
         if ( self.launchers[launcher]["application"].lower().find('mame') > 0 ) or ( self.settings[ "fanarts_scraper" ] == 'arcadeHITS' ):
@@ -746,13 +754,13 @@ class Main:
         xbmc.executebuiltin("Container.Update")
 
     def _scrap_fanart_launcher_algo(self, launcherID, title):
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30071 ) % (self.launchers[launcherID]["name"],(self.settings[ "fanarts_scraper" ]).encode('utf-8','ignore'))))
+        xbmc_notify(__language__( 30000 ), __language__( 30071 ) % (self.launchers[launcherID]["name"],(self.settings[ "fanarts_scraper" ]).encode('utf-8','ignore')),300000)
         xbmc.executebuiltin( "ActivateWindow(busydialog)" )
         covers = self._get_fanarts_list(self.launchers[launcherID]["gamesys"],title,self.settings[ "fanart_image_size" ])
         if covers:
             nb_images = len(covers)
             xbmc.executebuiltin( "Dialog.Close(busydialog)" )
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30072 ) % (nb_images,self.launchers[launcherID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30072 ) % (nb_images,self.launchers[launcherID]["name"]),3000)
             covers.insert(0,(self.launchers[launcherID]["fanart"],self.launchers[launcherID]["fanart"],__language__( 30068 )))
             self.image_url = MyDialog(covers)
             if ( self.image_url ):
@@ -768,22 +776,22 @@ class Main:
                                 if (self.settings[ "launcher_fanart_path" ] == "" ):
                                     self.settings[ "launcher_fanart_path" ] = DEFAULT_FANART_PATH
                                 file_path = os.path.join(self.settings[ "launcher_fanart_path" ],os.path.basename(self.launchers[launcherID]["application"])+'_fanart'+img_ext)
-                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 300000)" % (__language__( 30000 ), __language__( 30074 )))
+                            xbmc_notify(__language__( 30000 ), __language__( 30074 ),300000)
                             try:
                                 download_img(img_url,file_path)
                                 self.launchers[launcherID]["fanart"] = file_path
                                 self._save_launchers()
                                 _update_cache(file_path)
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
                             except socket.timeout:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30081 )))
+                                xbmc_notify(__language__( 30000 ), __language__( 30081 ),3000)
                             except exceptions.IOError:
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30064 ) % self.launchers[launcherID]["name"]))
+                                xbmc_notify(__language__( 30000 ), __language__( 30064 ) % self.launchers[launcherID]["name"],3000)
                     else:
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcherID]["name"])))
+                        xbmc_notify(__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcherID]["name"]),3000)
         else:
             xbmc.executebuiltin( "Dialog.Close(busydialog)" )
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcherID]["name"])))
+            xbmc_notify(__language__( 30000 ), __language__( 30073 ) % (self.launchers[launcherID]["name"]),3000)
 
     def _scrap_fanart_launcher(self, launcherID):
         keyboard = xbmc.Keyboard(self.launchers[launcherID]["name"], __language__( 30036 ))
@@ -818,7 +826,7 @@ class Main:
                     self.launchers[launcher]["roms"][rom]["studio"] = gamedata["studio"]
                     self.launchers[launcher]["roms"][rom]["plot"] = gamedata["plot"]
             else:
-                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30076 )))
+                xbmc_notify(__language__( 30000 ), __language__( 30076 ),3000)
     
     def _scrap_rom(self, launcher, rom):
         # Edition of the rom name
@@ -867,9 +875,9 @@ class Main:
             if len(item_genre) > 0 : self.launchers[launcher]["roms"][rom]["genre"] = item_genre[0]
             if len(item_plot) > 0 : self.launchers[launcher]["roms"][rom]["plot"] = item_plot[0].replace('&quot;','"')
             self._save_launchers()
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30083 ) % os.path.basename(nfo_file)))
+            xbmc_notify(__language__( 30000 ), __language__( 30083 ) % os.path.basename(nfo_file),3000)
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30082 ) % os.path.basename(nfo_file)))
+            xbmc_notify(__language__( 30000 ), __language__( 30082 ) % os.path.basename(nfo_file),3000)
 
     def _export_rom_nfo(self, launcher, rom):
         nfo_file=os.path.splitext(self.launchers[launcher]["roms"][rom]["filename"].decode(sys.getfilesystemencoding()))[0]+".nfo"
@@ -898,13 +906,13 @@ class Main:
             source.close()
             destination.close()
             os.remove(nfo_file+".tmp")
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30087 ) % os.path.basename(nfo_file).encode('utf8','ignore')))
+            xbmc_notify(__language__( 30000 ), __language__( 30087 ) % os.path.basename(nfo_file).encode('utf8','ignore'),3000)
         else:
             nfo_content = "<game>\n\t<title>"+self.launchers[launcher]["roms"][rom]["name"]+"</title>\n\t<platform>"+self.launchers[launcher]["roms"][rom]["gamesys"]+"</platform>\n\t<year>"+self.launchers[launcher]["roms"][rom]["release"]+"</year>\n\t<publisher>"+self.launchers[launcher]["roms"][rom]["studio"]+"</publisher>\n\t<genre>"+self.launchers[launcher]["roms"][rom]["genre"]+"</genre>\n\t<plot>"+self.launchers[launcher]["roms"][rom]["plot"]+"</plot>\n</game>\n"
             usock = open( nfo_file, 'w' )
             usock.write(nfo_content)
             usock.close()
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30086 ) % os.path.basename(nfo_file).encode('utf8','ignore')))
+            xbmc_notify(__language__( 30000 ), __language__( 30086 ) % os.path.basename(nfo_file).encode('utf8','ignore'),3000)
 
     def _add_roms(self, launcher):
         dialog = xbmcgui.Dialog()
@@ -975,9 +983,9 @@ class Main:
                                     self.categories[categoryID]["thumb"] = file_path
                                     self._save_launchers()
                                     _update_cache(file_path)
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
                                 except OSError:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30063 ) % self.categories[categoryID]["name"]))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30063 ) % self.categories[categoryID]["name"],3000)
             if (type2 == 2 ):
                 # Link to a category thumbnail image
                 if (self.categories[categoryID]["thumb"] == ""):
@@ -990,7 +998,7 @@ class Main:
                         self.categories[categoryID]["thumb"] = image
                         self._save_launchers()
                         _update_cache(image)
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                        xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
 
         # Launcher Fanart menu option
         if (type == 2 ):
@@ -1016,9 +1024,9 @@ class Main:
                                     self.categories[categoryID]["fanart"] = file_path
                                     self._save_launchers()
                                     _update_cache(file_path)
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
                                 except OSError:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30064 ) % self.categories[categoryID]["name"]))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30064 ) % self.categories[categoryID]["name"],3000)
             if (type2 == 2 ):
                 # Link to a category fanart image
                 if (self.categories[categoryID]["fanart"] == ""):
@@ -1031,7 +1039,7 @@ class Main:
                         self.categories[categoryID]["fanart"] = image
                         self._save_launchers()
                         _update_cache(image)
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                        xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
 
         if (type == 3 ):
             self._remove_category(categoryID)
@@ -1152,9 +1160,9 @@ class Main:
                                     self.launchers[launcherID]["thumb"] = file_path
                                     self._save_launchers()
                                     _update_cache(file_path)
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
                                 except OSError:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30063 ) % self.launchers[launcherID]["name"]))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30063 ) % self.launchers[launcherID]["name"],3000)
 
             if (type2 == 2 ):
                 # Link to a launcher thumbnail image
@@ -1168,7 +1176,7 @@ class Main:
                         self.launchers[launcherID]["thumb"] = image
                         self._save_launchers()
                         _update_cache(image)
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                        xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
 
         # Launcher Fanart menu option
         type_nb = type_nb+1
@@ -1200,9 +1208,9 @@ class Main:
                                     self.launchers[launcherID]["fanart"] = file_path
                                     self._save_launchers()
                                     _update_cache(file_path)
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30070 )))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
                                 except OSError:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30064 ) % self.launchers[launcherID]["name"]))
+                                    xbmc_notify(__language__( 30000 ), __language__( 30064 ) % self.launchers[launcherID]["name"],3000)
             if (type2 == 2 ):
                 # Link to a launcher fanart image
                 if (self.launchers[launcherID]["fanart"] == ""):
@@ -1215,7 +1223,7 @@ class Main:
                         self.launchers[launcherID]["fanart"] = image
                         self._save_launchers()
                         _update_cache(image)
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30075 )))
+                        xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
 
         # Launcher's change category
         type_nb = type_nb+1
@@ -1391,7 +1399,7 @@ class Main:
                 self.launchers[launcherID]["studio"] = gamedata["studio"]
                 self.launchers[launcherID]["plot"] = gamedata["plot"]
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30076 )))
+            xbmc_notify(__language__( 30000 ), __language__( 30076 ),3000)
 
     def _scrap_launcher(self, launcherID):
         # Edition of the launcher name
@@ -1437,9 +1445,9 @@ class Main:
             self.launchers[launcherID]["genre"] = item_genre[0]
             self.launchers[launcherID]["plot"] = item_plot[0].replace('&quot;','"')
             self._save_launchers()
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30083 ) % os.path.basename(nfo_file)))
+            xbmc_notify(__language__( 30000 ), __language__( 30083 ) % os.path.basename(nfo_file),3000)
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30082 ) % os.path.basename(nfo_file)))
+            xbmc_notify(__language__( 30000 ), __language__( 30082 ) % os.path.basename(nfo_file),3000)
 
     def _export_items_list_nfo(self, launcherID):
         for rom in self.launchers[launcherID]["roms"].iterkeys():
@@ -1479,13 +1487,13 @@ class Main:
             source.close()
             destination.close()
             os.remove(nfo_file+".tmp")
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30087 ) % os.path.basename(nfo_file)))
+            xbmc_notify(__language__( 30000 ), __language__( 30087 ) % os.path.basename(nfo_file),3000)
         else:
             nfo_content = "<launcher>\n\t<title>"+self.launchers[launcherID]["name"]+"</title>\n\t<platform>"+self.launchers[launcherID]["gamesys"]+"</platform>\n\t<year>"+self.launchers[launcherID]["release"]+"</year>\n\t<publisher>"+self.launchers[launcherID]["studio"]+"</publisher>\n\t<genre>"+self.launchers[launcherID]["genre"]+"</genre>\n\t<plot>"+self.launchers[launcherID]["plot"]+"</plot>\n</launcher>\n"
             usock = open( nfo_file, 'w' )
             usock.write(nfo_content)
             usock.close()
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30086 ) % os.path.basename(nfo_file)))
+            xbmc_notify(__language__( 30000 ), __language__( 30086 ) % os.path.basename(nfo_file),3000)
 
     def _run_launcher(self, launcherID):
         if (self.launchers.has_key(launcherID)):
@@ -1510,7 +1518,7 @@ class Main:
                     if (launcher["minimize"] == "true"):
                         _toogle_fullscreen()
                     if ( self.settings[ "launcher_notification" ] ):
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30034 ) % launcher["name"]))
+                        xbmc_notify(__language__( 30000 ), __language__( 30034 ) % launcher["name"],3000)
                     try:
                         xbmc.enableNavSounds(False)                                 
                     except:
@@ -1543,7 +1551,7 @@ class Main:
                         elif (sys.platform.startswith('darwin')):
                             os.system("\"%s\" %s " % (launcher["application"], arguments))
                         else:
-                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30609 )))
+                            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30609 ),3000)
                     xbmc.sleep(self.settings[ "start_tempo" ])
                     if (launcher["minimize"] == "true"):
                         _toogle_fullscreen()
@@ -1560,7 +1568,7 @@ class Main:
                             xbmc.sleep(self.settings[ "start_tempo" ]+100)
                             xbmc.Player().play()
             else:
-                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30611 ) % os.path.basename(launcher["application"])))
+                xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30611 ) % os.path.basename(launcher["application"]),3000)
 
     def _get_settings( self ):
         # get the users preference settings
@@ -1651,7 +1659,7 @@ class Main:
                                 try:
                                     filesnames = os.listdir(temprompath)
                                 except:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30610 )))
+                                    xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30610 ),3000)
                                 namestem = cleanromname[:-len(ext3)]
 
                                 for filesname in filesnames:
@@ -1717,7 +1725,7 @@ class Main:
                             if (launcher["minimize"] == "true"):
                                 _toogle_fullscreen()
                             if ( self.settings[ "launcher_notification" ] ):
-                                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30034 ) % rom["name"]))
+                                xbmc_notify(__language__( 30000 ), __language__( 30034 ) % rom["name"],3000)
                             try:
                                 xbmc.enableNavSounds(False)                                 
                             except:
@@ -1758,7 +1766,7 @@ class Main:
                                 elif (sys.platform.startswith('darwin')):
                                     os.system("\"%s\" %s " % (application, arguments))
                                 else:
-                                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30609 )))
+                                    xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30609 ),3000)
                             xbmc.sleep(self.settings[ "start_tempo" ])
                             try:
                                 xbmc.enableNavSounds(True)                            
@@ -1775,11 +1783,10 @@ class Main:
                                     xbmc.sleep(self.settings[ "start_tempo" ]+100)
                                     xbmc.Player().play()
                     else:
-                        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30611 ) % os.path.basename(rom["filename"])))
+                        xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30611 ) % os.path.basename(rom["filename"]),3000)
                 else:
-                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30611 ) % os.path.basename(launcher["application"])))
+                    xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30611 ) % os.path.basename(launcher["application"]),3000)
 
-    ''' get an xml data from an xml file '''
     def get_xml_source( self, xmlpath ):
         try:
             usock = open( xmlpath, 'r' )
@@ -1821,7 +1828,7 @@ class Main:
                     BACKUP_CURRENT_SOURCE_PATH = os.path.join( DEFAULT_BACKUP_PATH , timestamp+"launchers.xml" )
                     shutil.copy2(BASE_CURRENT_SOURCE_PATH, BACKUP_CURRENT_SOURCE_PATH)
                 except OSError:
-                    xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30600 )))
+                    xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30600 ),3000)
         try:
             xml_content = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"yes\"?>\n<advanced_launcher version=\"1.0\">\n\t<categories>\n"
             # Create Categories XML list
@@ -1847,12 +1854,11 @@ class Main:
             try:
                 shutil.copy2(TEMP_CURRENT_SOURCE_PATH, BASE_CURRENT_SOURCE_PATH)
             except OSError:
-                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30601 )))
-
+                xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30601 ),3000)
         except OSError:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30602 )))
+            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30602 ),3000)
         except IOError:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30603 )))
+            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30603 ),3000)
         os.remove(TEMP_CURRENT_SOURCE_PATH)
         xbmc.executebuiltin( "Dialog.Close(busydialog)" )
 
@@ -1935,7 +1941,7 @@ class Main:
                     self._add_rom(launcherID, roms[key]["name"], roms[key]["filename"], roms[key]["gamesys"], roms[key]["thumb"], defined_fanart, roms[key]["trailer"], roms[key]["custom"], roms[key]["genre"], roms[key]["release"], roms[key]["studio"], roms[key]["plot"], roms[key]["finished"], roms[key]["altapp"], roms[key]["altarg"], len(roms), key, False, "")
                 xbmcplugin.endOfDirectory( handle=int( self._handle ), succeeded=True, cacheToDisc=False )
             else:
-                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30349 )))
+                xbmc_notify(__language__( 30000 ), __language__( 30349 ),3000)
 
     def _report_hook( self, count, blocksize, totalsize ):
          percent = int( float( count * blocksize * 100) / totalsize )
@@ -1986,7 +1992,7 @@ class Main:
             pDialog.close()
             if not (removedRoms == 0):
                 self._print_log(__language__( 30502 ) % removedRoms)
-                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30502 ) % removedRoms))
+                xbmc_notify(__language__( 30000 ), __language__( 30502 ) % removedRoms,3000)
             else:
                 self._print_log(__language__( 30721 ))
                 
@@ -2234,9 +2240,9 @@ class Main:
                                             download_img(img_url,thumb)
                                             shutil.copy2( thumb.decode(sys.getfilesystemencoding(),'ignore') , cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
                                         except socket.timeout:
-                                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30604 )))
+                                            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30604 ),3000)
                                         except exceptions.IOError:
-                                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30605 )))
+                                            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30605 ),3000)
                                     else:
                                         if ( not os.path.isfile(thumb) ) & ( os.path.isfile(cached_thumb) ):
                                             os.remove(cached_thumb)
@@ -2289,9 +2295,9 @@ class Main:
                                             download_img(img_url,fanart)
                                             shutil.copy2( fanart.decode(sys.getfilesystemencoding(),'ignore') , cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
                                         except socket.timeout:
-                                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30606 )))
+                                            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30606 ),3000)
                                         except exceptions.IOError:
-                                            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30607 )))
+                                            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30607 ),3000)
                                     else:
                                         if ( not os.path.isfile(fanart) ) & ( os.path.isfile(cached_thumb) ):
                                             os.remove(cached_thumb)
@@ -2322,10 +2328,10 @@ class Main:
             pDialog.close()
 
         if (skipCount == 0):
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30015 ) % (romsCount) + " " + __language__( 30050 )))
+            xbmc_notify(__language__( 30000 ), __language__( 30015 ) % (romsCount) + " " + __language__( 30050 ),3000)
             xbmc.executebuiltin("XBMC.ReloadSkin()")
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30016 ) % (romsCount, skipCount) + " " + __language__( 30050 )))
+            xbmc_notify(__language__( 30000 ), __language__( 30016 ) % (romsCount, skipCount) + " " + __language__( 30050 ))
 
     def _add_category(self, name, thumb, fanart, genre, plot, total, key):
         commands = []
@@ -2422,12 +2428,6 @@ class Main:
         ext = launcher["romext"]
         roms = launcher["roms"]
         rompath = launcher["rompath"]
-        romgamesys = launcher["gamesys"]
-        thumb_path = launcher["thumbpath"]
-        fanart_path = launcher["fanartpath"]
-        trailer_path = launcher["trailerpath"]
-        custom_path = launcher["custompath"]
-
         romfile = dialog.browse(1, __language__( 30017 ),"files", "."+ext.replace("|","|."), False, False, rompath)
         if (romfile):
             title=os.path.basename(romfile)
@@ -2438,73 +2438,60 @@ class Main:
                 if ( title == "" ):
                     title = os.path.basename(romfile)
                     title = title.replace('.'+title.split('.')[-1],'').replace('.',' ')
-                # prepare rom object data
-                romdata = {}
                 # Romname conversion if MAME
                 if ( app.lower().find('mame') > 0 ):
                     romname = self._get_mame_title(title)
-                    romdata["name"] = title_format(self,romname)
+                    romname = title_format(self,romname)
                 else:
-                    romdata["name"] = title_format(self,title)
-                romdata["filename"] = romfile
-                romdata["gamesys"] = romgamesys
-                romdata["thumb"] = ""
-                romdata["fanart"] = ""
+                    romname = title_format(self,title)
                 # Search for default thumbnails and fanart images path
                 ext2s = ['png', 'jpg', 'gif', 'jpeg', 'bmp', 'PNG', 'JPG', 'GIF', 'JPEG', 'BMP']
+                thumb_path = launcher["thumbpath"]
+                fanart_path = launcher["fanartpath"]
+                romthumb = ""
+                romfanart = ""
                 f = os.path.basename(romfile)
                 for ext2 in ext2s:
                     if (thumb_path == fanart_path) :
                         if (thumb_path == rompath) :
                             if (os.path.isfile(os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_thumb.'+ext2)))):
-                                romdata["thumb"] = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_thumb.'+ext2))
+                                romthumb = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_thumb.'+ext2))
                         else:
                             if (os.path.isfile(os.path.join(thumb_path, f.replace("."+f.split(".")[-1], '_thumb.'+ext2)))):
-                                romdata["thumb"] = os.path.join(thumb_path, f.replace("."+f.split(".")[-1], '_thumb.'+ext2))
+                                romthumb = os.path.join(thumb_path, f.replace("."+f.split(".")[-1], '_thumb.'+ext2))
                     else:
                         if (thumb_path == "") :
-                            romdata["thumb"] = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_thumb.jpg'))
+                            romthumb = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_thumb.jpg'))
                         else:
                             if (thumb_path == rompath) :
                                 if (os.path.isfile(os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '.'+ext2)))):
-                                    romdata["thumb"] = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '.'+ext2))
+                                    romthumb = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '.'+ext2))
                             else:
                                 if (os.path.isfile(os.path.join(thumb_path, f.replace("."+f.split(".")[-1], '.'+ext2)))):
-                                    romdata["thumb"] = os.path.join(thumb_path, f.replace("."+f.split(".")[-1], '.'+ext2))
+                                    romthumb = os.path.join(thumb_path, f.replace("."+f.split(".")[-1], '.'+ext2))
 
                     if (fanart_path == thumb_path) :
                         if (fanart_path == rompath) :
                             if (os.path.isfile(os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_fanart.'+ext2)))):
-                                romdata["fanart"] = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_fanart.'+ext2))
+                                romfanart = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_fanart.'+ext2))
                         else:
                             if (os.path.isfile(os.path.join(fanart_path, f.replace("."+f.split(".")[-1], '_fanart.'+ext2)))):
-                                romdata["fanart"] = os.path.join(fanart_path, f.replace("."+f.split(".")[-1], '_fanart.'+ext2))
+                                romfanart = os.path.join(fanart_path, f.replace("."+f.split(".")[-1], '_fanart.'+ext2))
                     else:
                         if (fanart_path == "") :
-                            romdata["fanart"] = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_fanart.jpg'))
+                            romfanart = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '_fanart.jpg'))
                         else:
                             if (fanart_path == rompath) :
                                 if (os.path.isfile(os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '.'+ext2)))):
-                                   romdata["fanart"] = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '.'+ext2))
+                                   romfanart = os.path.join(os.path.dirname(romfile), f.replace("."+f.split(".")[-1], '.'+ext2))
                             else:
                                 if (os.path.isfile(os.path.join(fanart_path, f.replace("."+f.split(".")[-1], '.'+ext2)))):
-                                    romdata["fanart"] = os.path.join(fanart_path, f.replace("."+f.split(".")[-1], '.'+ext2))
-                romdata["custom"] = custom_path
-                romdata["trailer"] = ""
-                romdata["genre"] = ""
-                romdata["release"] = ""
-                romdata["studio"] = ""
-                romdata["plot"] = ""
-                romdata["finished"] = "false"
-                romdata["altapp"] = ""
-                romdata["altarg"] = ""
-
+                                    romfanart = os.path.join(fanart_path, f.replace("."+f.split(".")[-1], '.'+ext2))
+                romdata = {"name":romname,"filename":romfile,"gamesys":launcher["gamesys"],"thumb":romthumb,"fanart":romfanart,"custom":launcher["custompath"],"trailer":"","genre":"","release":"","studio":"","plot":"","finished":"false","altapp":"","altarg":""}
                 # add rom to the roms list (using name as index)
                 romid = _get_SID()
                 roms[romid] = romdata
-
-                xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30019 ) + " " + __language__( 30050 )))
-
+                xbmc_notify(__language__( 30000 ), __language__( 30019 ) + " " + __language__( 30050 ),3000)
         self._save_launchers()
 
     def _add_new_category ( self ) :
@@ -2512,21 +2499,15 @@ class Main:
         keyboard = xbmc.Keyboard("", __language__( 30112 ))
         keyboard.doModal()
         if (keyboard.isConfirmed()):
-            categorydata = {}
-            categorydata["name"] = keyboard.getText()
-            categorydata["thumb"] = ""
-            categorydata["fanart"] = ""
-            categorydata["genre"] = ""
-            categorydata["plot"] = ""
+            categorydata = {"name":keyboard.getText(),"thumb":"","fanart":"","genre":"","plot":""}
             categoryid = _get_SID()
             self.categories[categoryid] = categorydata
             self._save_launchers()
             xbmc.executebuiltin("Container.Refresh")
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 ), __language__( 30113 ) % categorydata["name"]))
+            xbmc_notify(__language__( 30000 ), __language__( 30113 ) % categorydata["name"],3000)
             return True
         else:
             return False
-
 
     def _add_new_launcher ( self, categoryID ) :
         if ( self.categories.has_key(categoryID) ):
@@ -2567,47 +2548,24 @@ class Main:
                         fanart_path = xbmcgui.Dialog().browse(0,__language__( 30060 ),"files","", False, False)
                     else:
                         fanart_path = self.settings[ "launcher_fanart_path" ]
-                    # prepare launcher object data
-                    launcherdata = {}
-                    launcherdata["name"] = title
-                    launcherdata["category"] = categoryID
-                    launcherdata["application"] = app
-                    launcherdata["args"] = args
-                    launcherdata["rompath"] = ""
-                    if (thumb_path):
-                        launcherdata["thumbpath"] = thumb_path
-                    else:
-                        launcherdata["thumbpath"] = ""
-                    if (fanart_path):
-                        launcherdata["fanartpath"] = fanart_path
-                    else:
-                        launcherdata["fanartpath"] = ""
-                    launcherdata["custompath"] = ""
-                    launcherdata["trailerpath"] = ""
-                    launcherdata["romext"] = ""
+                    # create launcher object data
+                    if not (thumb_path):
+                        thumb_path = ""
+                    if not (fanart_path):
+                        fanart_path = ""
                     if (not gamesystem == -1 ):
-                        launcherdata["gamesys"] = platforms[gamesystem]
+                        launcher_gamesys = platforms[gamesystem]
                     else:
-                        launcherdata["gamesys"] = ""
-                    launcherdata["thumb"] = ""
-                    launcherdata["fanart"] = ""
-                    launcherdata["genre"] = ""
-                    launcherdata["release"] = ""
-                    launcherdata["studio"] = ""
-                    launcherdata["plot"] = ""
-                    launcherdata["finished"] = "false"
+                        launcher_gamesys = ""
                     if (sys.platform == "win32"):
-                        launcherdata["lnk"] = "true"
+                        launcher_lnk = "true"
                     else:
-                        launcherdata["lnk"] = ""
-                    launcherdata["minimize"] = "false"
-                    launcherdata["roms"] = {}
-
+                        launcher_lnk = ""
+                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":thumb_path, "fanartpath":fanart_path, "custompath":"", "trailerpath":"", "romext":"", "gamesys":launcher_gamesys, "thumb":"", "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":launcher_lnk, "minimize":"false", "roms":{}}
                     # add launcher to the launchers list (using name as index)
                     launcherid = _get_SID()
                     self.launchers[launcherid] = launcherdata
                     self._save_launchers()
-
                     xbmc.executebuiltin("ReplaceWindow(Programs,%s?%s)" % (self._path,categoryID))
                     return True
 
@@ -2639,42 +2597,20 @@ class Main:
                             # Selection of the thumbnails and fanarts path
                             thumb_path = xbmcgui.Dialog().browse(0,__language__( 30059 ),"files","", False, False, os.path.join(path))
                             fanart_path = xbmcgui.Dialog().browse(0,__language__( 30060 ),"files","", False, False, os.path.join(path))
-                            # prepare launcher object data
-                            launcherdata = {}
-                            launcherdata["name"] = title
-                            launcherdata["category"] = categoryID
-                            launcherdata["application"] = app
-                            launcherdata["args"] = args
-                            launcherdata["rompath"] = path
-                            if (thumb_path):
-                                launcherdata["thumbpath"] = thumb_path
-                            else:
-                                launcherdata["thumbpath"] = ""
-                            if (fanart_path):
-                                launcherdata["fanartpath"] = fanart_path
-                            else:
-                                launcherdata["fanartpath"] = ""
-                            launcherdata["custompath"] = ""
-                            launcherdata["trailerpath"] = ""
-                            launcherdata["romext"] = ext
+                            # create launcher object data
+                            if not (thumb_path):
+                                thumb_path = ""
+                            if not (fanart_path):
+                                fanart_path = ""
                             if (not gamesystem == -1 ):
-                                launcherdata["gamesys"] = platforms[gamesystem]
+                                launcher_gamesys = platforms[gamesystem]
                             else:
-                                launcherdata["gamesys"] = ""
-                            launcherdata["thumb"] = ""
-                            launcherdata["fanart"] = ""
-                            launcherdata["genre"] = ""
-                            launcherdata["release"] = ""
-                            launcherdata["studio"] = ""
-                            launcherdata["plot"] = ""
-                            launcherdata["finished"] = "false"
+                                launcher_gamesys = ""
                             if (sys.platform == "win32"):
-                                launcherdata["lnk"] = "true"
+                                launcher_lnk = "true"
                             else:
-                                launcherdata["lnk"] = ""
-                            launcherdata["minimize"] = "false"
-                            launcherdata["roms"] = {}
-
+                                launcher_lnk = ""
+                            launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":path, "thumbpath":thumb_path, "fanartpath":fanart_path, "custompath":"", "trailerpath":"", "romext":ext, "gamesys":launcher_gamesys, "thumb":"", "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":launcher_lnk, "minimize":"false", "roms":{}}
                             # add launcher to the launchers list (using name as index)
                             launcherid = _get_SID()
                             self.launchers[launcherid] = launcherdata
@@ -2684,7 +2620,7 @@ class Main:
             if (type == 2):
                 self._file_manager()
         else:
-            xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30613 )))
+            xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30613 ),3000)
             xbmc.executebuiltin("ReplaceWindow(Programs,%s)" % (self._path))
             return False
             
@@ -2812,13 +2748,16 @@ def MyDialog(img_list):
         print_exc()
         return False
     del w
+
+def xbmc_notify(title,text,time):
+    xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (title,text,time,ICON_IMG_FILE))
     
 def _update_cache(file_path):
     cached_thumb = Thumbnails().get_cached_covers_thumb( file_path ).replace("tbn" , os.path.splitext(file_path)[-1][1:4])
     try:
         shutil.copy2( file_path.decode(sys.getfilesystemencoding(),'ignore') , cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
     except OSError:
-        xbmc.executebuiltin("XBMC.Notification(%s,%s, 3000)" % (__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30608 )))
+        xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30608 ),3000)
     xbmc.executebuiltin("XBMC.ReloadSkin()")
 
 def title_format(self,title):
