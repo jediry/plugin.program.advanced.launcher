@@ -2331,7 +2331,7 @@ class Main:
             xbmc_notify(__language__( 30000 ), __language__( 30015 ) % (romsCount) + " " + __language__( 30050 ),3000)
             xbmc.executebuiltin("XBMC.ReloadSkin()")
         else:
-            xbmc_notify(__language__( 30000 ), __language__( 30016 ) % (romsCount, skipCount) + " " + __language__( 30050 ))
+            xbmc_notify(__language__( 30000 ), __language__( 30016 ) % (romsCount, skipCount) + " " + __language__( 30050 ),3000)
 
     def _add_category(self, name, thumb, fanart, genre, plot, total, key):
         commands = []
