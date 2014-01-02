@@ -82,8 +82,6 @@ def __language__(string):
 
 # Main code
 
-print ICON_IMG_FILE
-
 class Main:
     launchers = {}
     categories = {}
@@ -95,6 +93,8 @@ class Main:
 
         # get users preference
         self._get_settings()
+
+        # Load launchers
         self._load_launchers(self.get_xml_source(BASE_CURRENT_SOURCE_PATH))
 
         # get users scrapers preference
@@ -110,19 +110,20 @@ class Main:
         self._print_log(__language__( 30700 ))
 
         # if a commmand is passed as parameter
-        param = sys.argv[ 2 ]
+        param = sys.argv[ 2 ].replace("%2f","/")
 
-        xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL)
-        xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_VIDEO_YEAR)
-        xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_STUDIO)
-        xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_GENRE)
-        xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_UNSORTED)
+        if ( self._handle > 0 ):
+            xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_LABEL)
+            xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_VIDEO_YEAR)
+            xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_STUDIO)
+            xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_GENRE)
+            xbmcplugin.addSortMethod(handle=self._handle, sortMethod=xbmcplugin.SORT_METHOD_UNSORTED)
 
         # If parameters are passed...
         if param:
             param = param[1:]
             command = param.split(COMMAND_ARGS_SEPARATOR)
-            command_part = command[0].replace("%2f","/").split("/")
+            command_part = command[0].split("/")
 
             # check the action needed
             if ( len(command_part) == 4 ):
@@ -862,6 +863,7 @@ class Main:
         if (os.path.isfile(nfo_file)):
             f = open(nfo_file, 'r')
             item_nfo = f.read().replace('\r','').replace('\n','')
+            f.close()
             item_title = re.findall( "<title>(.*?)</title>", item_nfo )
             item_platform = re.findall( "<platform>(.*?)</platform>", item_nfo )
             item_year = re.findall( "<year>(.*?)</year>", item_nfo )
@@ -1444,6 +1446,7 @@ class Main:
             self.launchers[launcherID]["studio"] = item_publisher[0]
             self.launchers[launcherID]["genre"] = item_genre[0]
             self.launchers[launcherID]["plot"] = item_plot[0].replace('&quot;','"')
+            f.close()
             self._save_launchers()
             xbmc_notify(__language__( 30000 ), __language__( 30083 ) % os.path.basename(nfo_file),3000)
         else:
@@ -1614,7 +1617,7 @@ class Main:
 
     def _print_log(self,string):
         if (self.settings[ "show_log" ]):
-            print "["+__language__( 30744 )+"] "+string
+            print __language__( 30744 )+": "+string
 
     def _get_scrapers( self ):
         # get the users gamedata scrapers preference
@@ -1809,6 +1812,7 @@ class Main:
             return ""
 
     def _save_launchers (self):
+        self._print_log(__language__( 30746 )) 
         xbmc.executebuiltin( "ActivateWindow(busydialog)" )
         if ( self.settings[ "auto_backup" ] ):
             # Delete oldest backup file
@@ -1872,6 +1876,7 @@ class Main:
         xbmc.executebuiltin("Container.Refresh")
 
     def _load_launchers(self, xmlSource):
+        self._print_log(__language__( 30747 )) 
         # clean, save and return the xml string
         xmlSource = xmlSource.replace("&amp;", "&").replace('\r','').replace('\n','').replace('\t','')
         # Get categories list from XML source
@@ -2387,10 +2392,11 @@ class Main:
         listitem.setInfo( "video", { "Title": name, "Label": os.path.basename(cmd), "Plot" : plot , "Studio" : studio , "Genre" : genre , "Premiered" : release  , display_date_format : release  , "Writer" : gamesys , "Trailer" : os.path.join(trailerpath), "Director" : os.path.join(custompath), "overlay": ICON_OVERLAY } )
         listitem.addContextMenuItems( commands )
         if ( finished == "false" ) or ( self.settings[ "hide_finished" ] == False) :
-            if (len(roms) > 0) :
-                xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s"  % (self._path, category, key), listitem=listitem, isFolder=True)
-            else:
-                xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s"  % (self._path, category, key), listitem=listitem, isFolder=False)
+            xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s"  % (self._path, category, key), listitem=listitem, isFolder=True)
+            #if (len(roms) > 0) :
+            #    xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s"  % (self._path, category, key), listitem=listitem, isFolder=True)
+            #else:
+            #    xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s"  % (self._path, category, key), listitem=listitem, isFolder=False)
 
     def _add_rom( self, launcherID, name, cmd , romgamesys, thumb, romfanart, romtrailer, romcustom, romgenre, romrelease, romstudio, romplot, finished, altapp, altarg, total, key, search, search_url):
         if (int(xbmc.getInfoLabel("System.BuildVersion")[0:2]) < 12 ):
@@ -2419,7 +2425,8 @@ class Main:
             commands.append((__language__( 30513 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, SEARCH_COMMAND) , ))
         listitem.addContextMenuItems( commands )
         if ( finished == "false" ) or ( self.settings[ "hide_finished" ] == False) :
-            xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s/%s"  % (self._path, self.launchers[launcherID]["category"], launcherID, key), listitem=listitem, isFolder=False)
+            xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s/%s"  % (self._path, self.launchers[launcherID]["category"], launcherID, key), listitem=listitem, isFolder=True)            
+            #xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s/%s"  % (self._path, self.launchers[launcherID]["category"], launcherID, key), listitem=listitem, isFolder=False)
 
     def _add_new_rom ( self , launcherID) :
         dialog = xbmcgui.Dialog()
@@ -2836,6 +2843,7 @@ def _get_game_system_list():
             result = line.replace('\n', '').replace('"', '').split(',')
             platforms.append(result[0])
         platforms.sort()
+        csvfile.close()
         return platforms
     except:
         return platforms

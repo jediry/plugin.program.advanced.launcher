@@ -282,6 +282,8 @@
     <string id="30741">URL received : %s</string>
     <string id="30742">application : %s</string>
     <string id="30743">arguments : %s</string>
-    <string id="30744">plugin.program.advanced.launcher</string>
+    <string id="30744">AdvancedLauncher</string>
     <string id="30745">Error: %s::%s (%d) - %s</string>
+    <string id="30746">Save launchers.xml file</string>
+    <string id="30747">Load launchers.xml file</string>
 </strings>

@@ -47,10 +47,10 @@ def _get_thumbnails_list(system,search,region,imgsize):
         page = f.read().replace('\n', '')
         boxarts = re.findall('<boxart side="front" (.*?)">(.*?)</boxart>', page)
         for indexa, boxart in enumerate(boxarts):
-            covers.append(("http://thegamesdb.net/banners/"+boxarts[indexa][1],"http://thegamesdb.net/banners/_cache/"+boxarts[indexa][1],"Cover "+str(indexa+1)))
+            covers.append(("http://thegamesdb.net/banners/"+boxarts[indexa][1],"http://thegamesdb.net/banners/"+boxarts[indexa][1],"Cover "+str(indexa+1)))
         banners = re.findall('<banner (.*?)">(.*?)</banner>', page)
         for indexb, banner in enumerate(banners):
-            covers.append(("http://thegamesdb.net/banners/"+banners[indexb][1],"http://thegamesdb.net/banners/_cache/"+banners[indexb][1],"Banner "+str(indexb+1)))
+            covers.append(("http://thegamesdb.net/banners/"+banners[indexb][1],"http://thegamesdb.net/banners/"+banners[indexb][1],"Banner "+str(indexb+1)))
         return covers
     except:
         return covers

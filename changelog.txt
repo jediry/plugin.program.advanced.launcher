@@ -1,3 +1,8 @@
+[B]2.2.2[/B]
+. Fix unclosed opened CSV and NFO files.
+. Fix negative handle problem.
+. Fix TheGameDB cached thumbs images display list.
+
 [B]2.2.1[/B]
 . Fix XBMC notification display bugs.
 
