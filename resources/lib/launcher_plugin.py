@@ -2762,7 +2762,7 @@ def xbmc_notify(title,text,time):
 def _update_cache(file_path):
     cached_thumb = Thumbnails().get_cached_covers_thumb( file_path ).replace("tbn" , os.path.splitext(file_path)[-1][1:4])
     try:
-        shutil.copy2( file_path.decode(sys.getfilesystemencoding(),'ignore') , cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
+        shutil.copy2( file_path.decode(sys.getfilesystemencoding(),'ignore'), cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
     except OSError:
         xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30608 ),3000)
     xbmc.executebuiltin("XBMC.ReloadSkin()")

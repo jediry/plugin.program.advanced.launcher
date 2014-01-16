@@ -1,3 +1,6 @@
+[B]2.2.3[/B]
+. Fix Sega Genesis 32X scrapers references
+
 [B]2.2.2[/B]
 . Fix unclosed opened CSV and NFO files.
 . Fix negative handle problem.
