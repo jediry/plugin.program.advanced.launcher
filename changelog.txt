@@ -1,3 +1,6 @@
+[B]2.2.5[/B]
+. Fix launcher information display
+
 [B]2.2.4[/B]
 . Fix Minimize option save.
 

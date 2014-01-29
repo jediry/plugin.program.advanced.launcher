@@ -1901,7 +1901,7 @@ class Main:
             for launcher in launchers:
                 launcherdata = {}
                 launcher_index = ["id","name","category","application","args","rompath","thumbpath","fanartpath","trailerpath","custompath","romext","gamesys","thumb","fanart","genre","release","studio","plot","finished","minimize","lnk","roms"]        
-                values = re.findall( "<id>(.*?)</id><name>(.*?)</name><category>(.*?)</category><application>(.*?)</application><args>(.*?)</args><rompath>(.*?)</rompath><thumbpath>(.*?)</thumbpath><fanartpath>(.*?)</fanartpath><trailerpath>(.*?)</trailerpath><custompath>(.*?)</custompath><romext>(.*?)</romext><platform>(.*?)</platform><thumb>(.*?)</thumb><fanart>(.*?)</fanart><genre>(.*?)</genre><release>(.*?)</release><publisher>(.*?)</publisher><launcherplot>(.*?)</launcherplot><finished>(.*?)</finished><minimize>(.*?)</minimize><lnk>(.*?)</lnk><roms>(.*?)</roms>", launcher)
+                values = re.findall("<id>(.*?)</id><name>(.*?)</name><category>(.*?)</category><application>(.*?)</application><args>(.*?)</args><rompath>(.*?)</rompath><thumbpath>(.*?)</thumbpath><fanartpath>(.*?)</fanartpath><trailerpath>(.*?)</trailerpath><custompath>(.*?)</custompath><romext>(.*?)</romext><platform>(.*?)</platform><thumb>(.*?)</thumb><fanart>(.*?)</fanart><genre>(.*?)</genre><release>(.*?)</release><publisher>(.*?)</publisher><launcherplot>(.*?)</launcherplot><finished>(.*?)</finished><minimize>(.*?)</minimize><lnk>(.*?)</lnk><roms>(.*?)</roms>", launcher)
                 for index, n in enumerate(launcher_index):
                     launcherdata[n] = values[0][index]
                 # Get roms list from XML source
@@ -2388,7 +2388,7 @@ class Main:
         else:
             ICON_OVERLAY = 7
         listitem.setProperty("fanart_image", fanart)
-        listitem.setInfo( "videoz", { "Title": name, "Label": os.path.basename(cmd), "Plot" : plot , "Studio" : studio , "Genre" : genre , "Premiered" : release  , display_date_format : release  , "Writer" : gamesys , "Trailer" : os.path.join(trailerpath), "Director" : os.path.join(custompath), "overlay": ICON_OVERLAY } )
+        listitem.setInfo( "video", { "Title": name, "Label": os.path.basename(cmd), "Plot" : plot , "Studio" : studio , "Genre" : genre , "Premiered" : release  , display_date_format : release  , "Writer" : gamesys , "Trailer" : os.path.join(trailerpath), "Director" : os.path.join(custompath), "overlay": ICON_OVERLAY } )
         listitem.addContextMenuItems( commands )
         if ( finished == "false" ) or ( self.settings[ "hide_finished" ] == False) :
             xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s"  % (self._path, category, key), listitem=listitem, isFolder=True)
