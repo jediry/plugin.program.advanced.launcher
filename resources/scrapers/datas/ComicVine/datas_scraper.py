@@ -12,27 +12,30 @@ def _get_games_list(search):
     results = []
     display = []
     try:
-        f = urllib.urlopen('http://www.comicvine.com/search/?indices[0]=cv_issue&q="'+urllib.quote(search.lower())+'"')
-        page = f.read().replace('\r\n', '').replace('\n', '').strip('\t')
-        issues = re.findall('/4000-(.*?)/">        <div class="img imgflare">                      <img src="(.*?)" alt="(.*?)">                  </div>        <h3 class="title">          (.*?)        </h3>        <p class="specs icon icon-tags">          <span class="type"><span class="search-company">(.*?)</span> <span class="search-type">issue</span> <span class="search-publish-date">\((.*?)\)</span>', page)
-        for issue in issues:
-            comic = {}
-            comic["id"] = issue[0]
-            comic["title"] = unescape(issue[2])
-            comic["studio"] = issue[4]
-            comic["release"] = issue[5][-4:]
-            comic["order"] = 1
-            comic_volume = comic["title"].split(' - ')
-            if ( comic_volume[0].lower() == search.lower() ):
-                comic["order"] += 1
-            if ( comic["title"].lower() == search.lower() ):
-                comic["order"] += 1
-            if ( comic["title"].lower().find(search.lower()) != -1 ):
-                comic["order"] += 1
-            results.append(comic)
+        for num in range(1,3):
+            f = urllib.urlopen('http://www.comicvine.com/jsonsearch/?indices[0]=issue&page='+str(num)+'&q="'+urllib.quote(search.lower())+'"')
+            json = simplejson.loads(f.read())
+            for issue in json['results']:
+                comic = {}
+                comic["id"] = issue["id"]
+                comic["title"] = issue["title"].encode('utf-8','ignore')
+                comic["studio"] = issue["company"].encode('utf-8','ignore')
+                try:
+                    comic["release"] = " / "+issue["cover_date"][0:4].encode('utf-8','ignore')
+                except:
+                    comic["release"] = ""
+                comic["order"] = 1
+                comic_volume = comic["title"].split(' - ')
+                if ( comic_volume[0].lower() == search.lower() ):
+                    comic["order"] += 1
+                if ( comic["title"].lower() == search.lower() ):
+                    comic["order"] += 1
+                if ( comic["title"].lower().find(search.lower()) != -1 ):
+                    comic["order"] += 1
+                results.append(comic)
         results.sort(key=lambda result: result["order"], reverse=True)
         for result in results:
-            display.append(result["title"].encode('utf-8','ignore')+' ('+result["studio"].encode('utf-8','ignore')+' / '+result["release"].encode('utf-8','ignore')+')')
+            display.append(result["title"]+' ('+result["studio"]+result["release"]+')')
         return results,display
     except:
         return results,display
@@ -50,7 +53,7 @@ def _get_game_data(comic_id):
     comicdata["studio"] = ""
     comicdata["plot"] = ""
     try:
-        f = urllib.urlopen(comicvine_api_url+'/issue/'+comic_id+'/?api_key='+comicvine_api_key+'&format=json&field_list=cover_date,description,volume,name,issue_number')
+        f = urllib.urlopen(comicvine_api_url+'/issue/4000-'+comic_id+'/?api_key='+comicvine_api_key+'&format=json&field_list=cover_date,description,volume,name,issue_number')
         json = simplejson.loads(f.read())
         f.close()
         if ( json['results']['cover_date'] ):
@@ -59,10 +62,10 @@ def _get_game_data(comic_id):
             p = re.compile(r'<.*?>')
             comicdata["plot"] = p.sub('', unescape(json['results']['description'].encode('utf-8','ignore')))
         if ( json['results']['volume'] ):
-            f = urllib.urlopen(comicvine_api_url+'/volume/'+str(json['results']['volume']['id'])+'/?api_key='+comicvine_api_key+'&format=json&field_list=publisher')
+            f = urllib.urlopen(str(json['results']['volume']['api_detail_url'])+'?api_key='+comicvine_api_key+'&format=json&field_list=publisher')
             json2 = simplejson.loads(f.read())
             f.close()
-            if ( json2['results']['publisher'] ):
+            if (json2['results']['publisher']['name']):
                 comicdata["studio"] = str(json2['results']['publisher']['name']).encode('utf-8','ignore')
         return comicdata
     except:
