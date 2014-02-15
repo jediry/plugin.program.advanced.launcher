@@ -53,7 +53,7 @@ def _get_game_data(comic_id):
     comicdata["studio"] = ""
     comicdata["plot"] = ""
     try:
-        f = urllib.urlopen(comicvine_api_url+'/issue/4000-'+comic_id+'/?api_key='+comicvine_api_key+'&format=json&field_list=cover_date,description,volume,name,issue_number')
+        f = urllib.urlopen(comicvine_api_url+'/issue/4000-'+str(comic_id)+'/?api_key='+comicvine_api_key+'&format=json&field_list=cover_date,description,volume,name,issue_number')
         json = simplejson.loads(f.read())
         f.close()
         if ( json['results']['cover_date'] ):
