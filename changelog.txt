@@ -1,3 +1,6 @@
+[B]2.2.8[/B]
+. Fix "Remote Share" Could not connect to network server message display under Windows.
+
 [B]2.2.7[/B]
 . Fix ComicVine data scrapers.
 
