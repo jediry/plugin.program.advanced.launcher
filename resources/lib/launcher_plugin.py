@@ -24,6 +24,7 @@ from xbmcaddon import Addon
 import subprocess_hack
 from user_agent import getUserAgent
 from file_item import Thumbnails
+from xml.dom.minidom import parse
 
 # Dharma compatibility (import md5)
 try:
@@ -35,6 +36,7 @@ except:
 PLUGIN_DATA_PATH = xbmc.translatePath(os.path.join("special://profile/addon_data","plugin.program.advanced.launcher"))
 BASE_PATH = xbmc.translatePath(os.path.join("special://","profile"))
 HOME_PATH = xbmc.translatePath(os.path.join("special://","home"))
+FAVOURITES_PATH = xbmc.translatePath( 'special://profile/favourites.xml' )
 ADDONS_PATH = xbmc.translatePath(os.path.join(HOME_PATH,"addons"))
 CURRENT_ADDON_PATH = xbmc.translatePath(os.path.join(ADDONS_PATH,"plugin.program.advanced.launcher"))
 BASE_CURRENT_SOURCE_PATH = os.path.join(PLUGIN_DATA_PATH,"launchers.xml")
@@ -311,7 +313,7 @@ class Main:
 
     def _edit_rom(self, launcher, rom):
         dialog = xbmcgui.Dialog()
-        title=os.path.basename(self.launchers[launcher]["roms"][rom]["filename"])
+        title=os.path.basename(self.launchers[launcher]["roms"][rom]["name"])
         if (self.launchers[launcher]["roms"][rom]["finished"] == "false"):
             finished_display = __language__( 30339 )
         else:
@@ -1065,7 +1067,7 @@ class Main:
 
     def _edit_launcher(self, launcherID):
         dialog = xbmcgui.Dialog()
-        title=os.path.basename(self.launchers[launcherID]["application"])
+        title=os.path.basename(self.launchers[launcherID]["name"])
         if (self.launchers[launcherID]["finished"] == "false"):
             finished_display = __language__( 30339 )
         else:
@@ -1518,8 +1520,7 @@ class Main:
         if (self.launchers.has_key(launcherID)):
             launcher = self.launchers[launcherID]
             apppath = os.path.dirname(launcher["application"])
-            if ( os.path.basename(launcher["application"]).lower().replace(".exe" , "") == "xbmc" ):
-                print launcher["args"]
+            if ( os.path.basename(launcher["application"]).lower().replace(".exe" , "") == "xbmc" ) or ("xbmc-fav-" in launcher["application"]) or ("xbmc-sea-" in launcher["application"]):
                 xbmc.executebuiltin('XBMC.%s' % launcher["args"])
             else:
                 if ( os.path.exists(apppath) ) :
@@ -2531,7 +2532,7 @@ class Main:
     def _add_new_launcher ( self, categoryID ) :
         if ( self.categories.has_key(categoryID) ):
             dialog = xbmcgui.Dialog()
-            type = dialog.select(__language__( 30101 ), [__language__( 30021 ), __language__( 30022 ), __language__( 30026 ),__language__( 30051 )])
+            type = dialog.select(__language__( 30101 ), [__language__( 30021 ), __language__( 30022 ), __language__( 30026 ), __language__( 30027 ),__language__( 30051 )])
             if (os.environ.get( "OS", "xbox" ) == "xbox"):
                 filter = ".xbe|.cut"
             else:
@@ -2639,7 +2640,8 @@ class Main:
             if (type == 2):
                 launcher_query, query = self._find_roms(True)
                 if (launcher_query):
-                    app = "xbmc"
+                    launcherid = _get_SID()
+                    app = "xbmc-sea-%s" % launcherid
                     args = 'ActivateWindow(10001,"%s")' % launcher_query
                     title = os.path.basename(query)
                     keyboard = xbmc.Keyboard(title.replace('.'+title.split('.')[-1],'').replace('.',' '), __language__( 30025 ))
@@ -2647,25 +2649,7 @@ class Main:
                     title = keyboard.getText()
                     if ( title == "" ):
                         title = os.path.basename(launcher_query)
-                    # Selection of the thumbnails and fanarts path
-                    if ( self.settings[ "launcher_thumb_path" ] == "" ):
-                        thumb_path = xbmcgui.Dialog().browse(0,__language__( 30059 ),"files","", False, False)
-                    else:
-                        thumb_path = self.settings[ "launcher_thumb_path" ]
-                    if ( self.settings[ "launcher_fanart_path" ] == "" ):
-                        fanart_path = xbmcgui.Dialog().browse(0,__language__( 30060 ),"files","", False, False)
-                    else:
-                        fanart_path = self.settings[ "launcher_fanart_path" ]
-                    # create launcher object data
-                    if not (thumb_path):
-                        thumb_path = ""
-                    if not (fanart_path):
-                        fanart_path = ""
-                    if (sys.platform == "win32"):
-                        launcher_lnk = "true"
-                    else:
-                        launcher_lnk = ""
-                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":thumb_path, "fanartpath":fanart_path, "custompath":"", "trailerpath":"", "romext":"", "gamesys":"xbmc", "thumb":"", "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":launcher_lnk, "minimize":"false", "roms":{}}
+                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":"", "fanartpath":"", "custompath":"", "trailerpath":"", "romext":"", "gamesys":"xbmc", "thumb":"", "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":"", "minimize":"false", "roms":{}}
                     # add launcher to the launchers list (using name as index)
                     launcherid = _get_SID()
                     self.launchers[launcherid] = launcherdata
@@ -2674,6 +2658,31 @@ class Main:
                     return True
 
             if (type == 3):
+                favourites, fav_nanes = _get_favourites_list()
+                favourite_url = dialog.select(__language__( 30115 ), fav_nanes)
+                if ( favourite_url ):
+                    launcherid = _get_SID()
+                    app = "xbmc-fav-%s" % launcherid
+                    args = favourites[favourite_url][0]
+                    title = os.path.basename(favourites[favourite_url][2])
+                    keyboard = xbmc.Keyboard(title.replace('.'+title.split('.')[-1],'').replace('.',' '), __language__( 30025 ))
+                    keyboard.doModal()
+                    title = keyboard.getText()
+                    if ( title == "" ):
+                        title = os.path.basename(favourites[favourite_url][2])
+                    if (favourites[favourite_url][1] != ""):
+                        thumb = favourites[favourite_url][1]
+                    else:
+                        thumb = ""
+                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":"", "fanartpath":"", "custompath":"", "trailerpath":"", "romext":"", "gamesys":"xbmc", "thumb":thumb, "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":"", "minimize":"false", "roms":{}}
+                    # add launcher to the launchers list (using name as index)
+                    launcherid = _get_SID()
+                    self.launchers[launcherid] = launcherdata
+                    self._save_launchers()
+                    xbmc.executebuiltin("ReplaceWindow(Programs,%s?%s)" % (self._path,categoryID))
+                    return True
+
+            if (type == 4):
                 self._file_manager()
 
         else:
@@ -2912,6 +2921,21 @@ def _get_game_system_list():
         return platforms
     except:
         return platforms
+
+def _get_favourites_list():
+    favourites = []
+    fav_names = []
+    if os.path.isfile( FAVOURITES_PATH ):
+        fav_xml = parse( FAVOURITES_PATH )
+        fav_doc = fav_xml.documentElement.getElementsByTagName( 'favourite' )
+        for count, favourite in enumerate(fav_doc):
+            try:
+                fav_icon = favourite.attributes[ 'thumb' ].nodeValue
+            except:
+                fav_icon = "DefaultProgram.png"
+            favourites.append((favourite.childNodes[ 0 ].nodeValue.encode('utf8','ignore'), fav_icon.encode('utf8','ignore'), favourite.attributes[ 'name' ].nodeValue.encode('utf8','ignore')))
+            fav_names.append(favourite.attributes[ 'name' ].nodeValue.encode('utf8','ignore'))
+    return favourites, fav_names
 
 def _search_category(self,category):
     search = []

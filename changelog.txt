@@ -1,3 +1,6 @@
+[B]2.4.0[/B]
+. Add favourite launchers creation.
+
 [B]2.3.2[/B]
 . Fix thumb and fanart link creation for categories, launchers and items.
 
