@@ -1,3 +1,6 @@
+[B]2.4.1[/B]
+. Fix ComicVine thumbs scraper.
+
 [B]2.4.0[/B]
 . Add favourite launchers creation.
 

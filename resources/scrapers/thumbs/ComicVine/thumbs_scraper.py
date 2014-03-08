@@ -12,7 +12,7 @@ def _get_game_page_url(system,search):
     try:
         f = urllib.urlopen('http://www.comicvine.com/search/?indices[0]=cv_issue&q="'+urllib.quote(search.lower())+'"')
         page = f.read().replace('\r\n', '').replace('\n', '').strip('\t')
-        issues = re.findall('/4000-(.*?)/">        <div class="img imgflare">                      <img src="(.*?)" alt="(.*?)">                  </div>        <h3 class="title">          (.*?)        </h3>        <p class="specs icon icon-tags">          <span class="type"><span class="search-company">(.*?)</span> <span class="search-type">issue</span> <span class="search-publish-date">\((.*?)\)</span>', page)
+        issues = re.findall('/4000-(.*?)/">        <div class="img imgflare">                      <img src="(.*?)" alt="(.*?)">', page)
         for issue in issues:
             comic = {}
             comic["url"] = 'http://www.comicvine.com/issue/4000-'+issue[0]+'/'
@@ -20,7 +20,7 @@ def _get_game_page_url(system,search):
         return comics_results
     except:
         return comics_results
-       
+
 # Thumbnails list scrapper
 def _get_thumbnails_list(system,search,region,imgsize):
     covers = []
