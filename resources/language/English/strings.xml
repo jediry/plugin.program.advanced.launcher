@@ -15,7 +15,8 @@
     <string id="30023">Select the launcher application</string>
     <string id="30024">Application arguments</string>
     <string id="30025">Set the title of the launcher</string>
-    <string id="30026">Query launcher (search engine)</string>
+    <string id="30026">Query launcher (Adv.L search engine)</string>
+    <string id="30027">Favourite launcher (XBMC favourites)</string>
     <string id="30028">Set files extensions, use &quot;|&quot; as separator. (e.g lnk|cbr)</string>
     <string id="30033">Downloading: %s</string>
     <string id="30034">Launching %s.</string>

@@ -423,7 +423,7 @@ class Main:
                 if (image):
                     if (os.path.isfile(image)):
                         if ( self.launchers[launcher]["roms"][rom]["thumb"] != "" ):
-                            _update_cache(file_path)
+                            _update_cache(image)
                         self.launchers[launcher]["roms"][rom]["thumb"] = image
                         self._save_launchers()
                         xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
@@ -474,7 +474,7 @@ class Main:
                 if (image):
                     if (os.path.isfile(image)):
                         if ( self.launchers[launcher]["roms"][rom]["fanart"] != "" ):
-                            _update_cache(file_path)
+                            _update_cache(image)
                         self.launchers[launcher]["roms"][rom]["fanart"] = image
                         self._save_launchers()
                         xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
@@ -1008,7 +1008,7 @@ class Main:
                 if (image):
                     if (os.path.isfile(image)):
                         if ( self.categories[categoryID]["thumb"] != "" ):
-                            _update_cache(file_path)
+                            _update_cache(image)
                         self.categories[categoryID]["thumb"] = image
                         self._save_launchers()
                         xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
@@ -1051,7 +1051,7 @@ class Main:
                 if (image):
                     if (os.path.isfile(image)):
                         if ( self.categories[categoryID]["fanart"] != "" ):
-                            _update_cache(file_path)
+                            _update_cache(image)
                         self.categories[categoryID]["fanart"] = image
                         self._save_launchers()
                         xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
@@ -1189,7 +1189,7 @@ class Main:
                 if (image):
                     if (os.path.isfile(image)):
                         if ( self.launchers[launcherID]["thumb"] != "" ):
-                            _update_cache(file_path)
+                            _update_cache(image)
                         self.launchers[launcherID]["thumb"] = image
                         self._save_launchers()
                         xbmc_notify(__language__( 30000 ), __language__( 30070 ),3000)
@@ -1238,7 +1238,7 @@ class Main:
                 if (image):
                     if (os.path.isfile(image)):
                         if ( self.launchers[launcherID]["fanart"] != "" ):
-                            _update_cache(file_path)
+                            _update_cache(image)
                         self.launchers[launcherID]["fanart"] = image
                         self._save_launchers()
                         xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
@@ -2673,10 +2673,9 @@ class Main:
                     xbmc.executebuiltin("ReplaceWindow(Programs,%s?%s)" % (self._path,categoryID))
                     return True
 
-                print launcher_query
-
             if (type == 3):
                 self._file_manager()
+
         else:
             xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30613 ),3000)
             xbmc.executebuiltin("ReplaceWindow(Programs,%s)" % (self._path))

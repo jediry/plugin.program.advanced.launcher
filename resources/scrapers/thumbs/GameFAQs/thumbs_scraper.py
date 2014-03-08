@@ -15,8 +15,8 @@ def _get_game_page_url(system,search):
         req.add_unredirected_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31')
         search_page = urllib2.urlopen(req)
         for line in search_page.readlines():
-            if '>Pics</a></td>' in line:
-                games.append(re.findall('<a href="(.*?)">Pics</a></td>', line.replace('\r\n', '')))
+            if '>Images</a></td>' in line:
+                games.append(re.findall('<a href="(.*?)">Images</a></td>', line.replace('\r\n', '')))
         if games:
            return ''.join(games[0])
     except:
