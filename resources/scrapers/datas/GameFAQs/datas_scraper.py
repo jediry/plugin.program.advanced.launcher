@@ -60,17 +60,17 @@ def _get_game_data(game_url):
         req.add_unredirected_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31')
         f = urllib2.urlopen(req)
         page = f.read().replace('\r\n', '')
-        game_genre = re.findall('</a> &raquo; <a href="(.*?)">(.*?)</a> &raquo; <a href="/', page)
+        game_genre = re.findall('<li class="crumb top-crumb"><a href="/(.*?)">(.*?)</a></li><li class="crumb"><a href="/(.*?)/list-(.*?)">(.*?)</a></li>', page)
         if game_genre:
-            gamedata["genre"] = game_genre[0][1]
+            gamedata["genre"] = game_genre[0][4]
         game_release = re.findall('Release: <a href="(.*?)">(.*?) &raquo;</a>', page)
         if game_release:
             gamedata["release"] = game_release[0][1][-4:]
-        game_studio = re.findall('<ul><li><a href="/features/company/(.*?)">(.*?)</a></li>', page)
+        game_studio = re.findall('<li><a href="/features/company/(.*?)">(.*?)</a>', page)
         if game_studio:
             p = re.compile(r'<.*?>')
             gamedata["studio"] = p.sub('', game_studio[0][1])
-        game_plot = re.findall('Description</h2></div><div class="body"><div class="details">(.*?)</div></div>', page)
+        game_plot = re.findall('Description</h2></div><div class="body game_desc"><div class="desc">(.*?)</div>', page)
         if game_plot:
             gamedata["plot"] = unescape(game_plot[0])
         return gamedata

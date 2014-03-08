@@ -1,3 +1,7 @@
+[B]2.4.2[/B]
+. Fix GameFAQs info scraper.
+. Fix GameFAQs gamesystem reference list.
+
 [B]2.4.1[/B]
 . Fix ComicVine thumbs scraper.
 
