@@ -1,3 +1,6 @@
+[B]2.4.4[/B]
+. Fix first favourite item list launcher creation bug.
+
 [B]2.4.3[/B]
 . Add a new info collecting method : NFO+scraper
 

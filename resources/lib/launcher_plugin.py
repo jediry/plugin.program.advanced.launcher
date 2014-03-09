@@ -2669,7 +2669,7 @@ class Main:
             if (type == 3):
                 favourites, fav_nanes = _get_favourites_list()
                 favourite_url = dialog.select(__language__( 30115 ), fav_nanes)
-                if ( favourite_url ):
+                if ( favourite_url != -1):
                     launcherid = _get_SID()
                     app = "xbmc-fav-%s" % launcherid
                     args = favourites[favourite_url][0]
