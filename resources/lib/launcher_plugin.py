@@ -2658,7 +2658,7 @@ class Main:
                     title = keyboard.getText()
                     if ( title == "" ):
                         title = os.path.basename(launcher_query)
-                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":"", "fanartpath":"", "custompath":"", "trailerpath":"", "romext":"", "gamesys":"xbmc", "thumb":"", "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":"", "minimize":"false", "roms":{}}
+                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":DEFAULT_THUMB_PATH, "fanartpath":DEFAULT_FANART_PATH, "custompath":"", "trailerpath":"", "romext":"", "gamesys":"xbmc", "thumb":"", "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":"", "minimize":"false", "roms":{}}
                     # add launcher to the launchers list (using name as index)
                     launcherid = _get_SID()
                     self.launchers[launcherid] = launcherdata
@@ -2683,7 +2683,7 @@ class Main:
                         thumb = favourites[favourite_url][1]
                     else:
                         thumb = ""
-                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":"", "fanartpath":"", "custompath":"", "trailerpath":"", "romext":"", "gamesys":"xbmc", "thumb":thumb, "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":"", "minimize":"false", "roms":{}}
+                    launcherdata = {"name":title, "category":categoryID, "application":app, "args":args, "rompath":"", "thumbpath":DEFAULT_THUMB_PATH, "fanartpath":DEFAULT_FANART_PATH, "custompath":"", "trailerpath":"", "romext":"", "gamesys":"xbmc", "thumb":thumb, "fanart":"", "genre":"", "release":"", "studio":"", "plot":"", "finished":"false", "lnk":"", "minimize":"false", "roms":{}}
                     # add launcher to the launchers list (using name as index)
                     launcherid = _get_SID()
                     self.launchers[launcherid] = launcherdata

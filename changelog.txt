@@ -1,3 +1,6 @@
+[B]2.4.5[/B]
+. Fix default thumbs and fanarts paths for query and favourite launchers.
+
 [B]2.4.4[/B]
 . Fix first favourite item list launcher creation bug.
 
