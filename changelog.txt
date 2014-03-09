@@ -1,3 +1,6 @@
+[B]2.4.3[/B]
+. Add a new info collecting method : NFO+scraper
+
 [B]2.4.2[/B]
 . Fix GameFAQs info scraper.
 . Fix GameFAQs gamesystem reference list.

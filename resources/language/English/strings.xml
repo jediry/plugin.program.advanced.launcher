@@ -42,6 +42,7 @@
 
     <string id="30061">Importing %s info from %s</string>
     <string id="30062">Importing %s file from path</string>
+    <string id="30084">Importing %s info from NFO File or %s</string>
     <string id="30063">Impossible to assign thumb for %s</string>
     <string id="30064">Impossible to assign fanart for %s</string>
     <string id="30065">Importing %s thumb from %s</string>
@@ -124,6 +125,7 @@
     <string id="30166">Collecting Method</string>
     <string id="30167">NFO Files</string>
     <string id="30168">Scrapers</string>
+    <string id="30169">NFO Files + Scrapers</string>
     <string id="30170">Launchers Default Paths</string>
     <string id="30171">Title Formatting</string>
     <string id="30172">Local Images</string>

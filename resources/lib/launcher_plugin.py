@@ -2047,6 +2047,8 @@ class Main:
                 import_text = __language__( 30061 ) % (f.replace("."+f.split(".")[-1],""),__language__( 30167 ))
             if ( self.settings[ "datas_method" ] == "2" ):
                 import_text = __language__( 30061 ) % (f.replace("."+f.split(".")[-1],""),self.settings[ "datas_scraper" ].encode('utf-8','ignore'))
+            if ( self.settings[ "datas_method" ] == "3" ):
+                import_text = __language__( 30084 ) % (f.replace("."+f.split(".")[-1],""),self.settings[ "datas_scraper" ].encode('utf-8','ignore'))
             pDialog.update(filesCount * 100 / len(files), import_text)
             self._print_log(__language__( 30725 ) % fullname)
             for ext in exts.split("|"):
@@ -2100,10 +2102,13 @@ class Main:
                         self._print_log(import_text) 
                         self._print_log(__language__( 30732 ) % romname) 
                         # Search game title from scrapers
-                        if ( self.settings[ "datas_method" ] == "1" ):
+                        
+                        # Scrap from NFO files
+                        if ( self.settings[ "datas_method" ] == "1" ) or ( self.settings[ "datas_method" ] == "3" ) :
                             nfo_file=os.path.splitext(romdata["filename"])[0]+".nfo"
                             self._print_log(__language__( 30719 ) % nfo_file) 
                             if (os.path.isfile(nfo_file)):
+                                found_nfo = 1
                                 self._print_log(__language__( 30715 )) 
                                 self._print_log(__language__( 30733 ) % nfo_file) 
                                 ff = open(nfo_file, 'r')
@@ -2122,54 +2127,58 @@ class Main:
                                 if len(item_plot) > 0 : romdata["plot"] = item_plot[0].replace('&quot;','"')
                                 ff.close()
                             else:
+                                found_nfo = 0
                                 self._print_log(__language__( 30726 )) 
                                 romdata["name"] = title_format(self,romname)
-                                self._print_log(__language__( 30734 )) 
-                        else:
-                            if ( self.settings[ "datas_method" ] != "0" ):
-                                romdata["name"] = clean_filename(romname)
-                                if ( app.lower().find('mame') > 0 ) or ( self.settings[ "datas_scraper" ] == 'arcadeHITS' ):
-                                    self._print_log(__language__( 30735 )) 
-                                    results = self._get_first_game(f[:-len(ext)-1],gamesys)
+                                self._print_log(__language__( 30734 ))
+                                 
+                        # Scrap from www database
+                        if ( self.settings[ "datas_method" ] == "2" ) or ((self.settings[ "datas_method" ] == "3") and (found_nfo == 0)) :
+                            romdata["name"] = clean_filename(romname)
+                            if ( app.lower().find('mame') > 0 ) or ( self.settings[ "datas_scraper" ] == 'arcadeHITS' ):
+                                self._print_log(__language__( 30735 )) 
+                                results = self._get_first_game(f[:-len(ext)-1],gamesys)
+                                selectgame = 0
+                            else:
+                                if ( self.settings[ "scrap_info" ] == "1" ):
+                                    self._print_log(__language__( 30736 )) 
+                                    results = self._get_first_game(romdata["name"],gamesys)
                                     selectgame = 0
                                 else:
-                                    if ( self.settings[ "scrap_info" ] == "1" ):
-                                        self._print_log(__language__( 30736 )) 
-                                        results = self._get_first_game(romdata["name"],gamesys)
-                                        selectgame = 0
+                                    self._print_log(__language__( 30737 )) 
+                                    results,display = self._get_games_list(romdata["name"])
+                                    if display:
+                                        # Display corresponding game list found
+                                        dialog = xbmcgui.Dialog()
+                                        # Game selection
+                                        selectgame = dialog.select(__language__( 30078 ) % ( self.settings[ "datas_scraper" ] ), display)
+                                        if (selectgame == -1):
+                                            results = []
+                            if results:
+                                foundname = results[selectgame]["title"]
+                                if (foundname != ""):
+                                    if ( self.settings[ "ignore_title" ] ):
+                                        romdata["name"] = title_format(self,romname)
                                     else:
-                                        self._print_log(__language__( 30737 )) 
-                                        results,display = self._get_games_list(romdata["name"])
-                                        if display:
-                                            # Display corresponding game list found
-                                            dialog = xbmcgui.Dialog()
-                                            # Game selection
-                                            selectgame = dialog.select(__language__( 30078 ) % ( self.settings[ "datas_scraper" ] ), display)
-                                            if (selectgame == -1):
-                                                results = []
-                                if results:
-                                    foundname = results[selectgame]["title"]
-                                    if (foundname != ""):
-                                        if ( self.settings[ "ignore_title" ] ):
-                                            romdata["name"] = title_format(self,romname)
-                                        else:
-                                            romdata["name"] = title_format(self,foundname)
+                                        romdata["name"] = title_format(self,foundname)
 
-                                        # Game other game data
-                                        gamedata = self._get_game_data(results[selectgame]["id"])
-                                        romdata["genre"] = gamedata["genre"]
-                                        romdata["release"] = gamedata["release"]
-                                        romdata["studio"] = gamedata["studio"]
-                                        romdata["plot"] = gamedata["plot"]
-                                        progress_display = romdata["name"] + " (" + romdata["release"] + ")"
-                                    else:
-                                        progress_display = romname + ": " +__language__( 30503 )
+                                    # Game other game data
+                                    gamedata = self._get_game_data(results[selectgame]["id"])
+                                    romdata["genre"] = gamedata["genre"]
+                                    romdata["release"] = gamedata["release"]
+                                    romdata["studio"] = gamedata["studio"]
+                                    romdata["plot"] = gamedata["plot"]
+                                    progress_display = romdata["name"] + " (" + romdata["release"] + ")"
                                 else:
-                                    romdata["name"] = title_format(self,romname)
                                     progress_display = romname + ": " +__language__( 30503 )
                             else:
-                                self._print_log(__language__( 30738 )) 
                                 romdata["name"] = title_format(self,romname)
+                                progress_display = romname + ": " +__language__( 30503 )
+
+                        # No scrap
+                        if ( self.settings[ "datas_method" ] == "0" ):
+                            self._print_log(__language__( 30738 )) 
+                            romdata["name"] = title_format(self,romname)
 
                         # Search if thumbnails and fanarts already exist
                         self._print_log(__language__( 30704 ) % fullname )
