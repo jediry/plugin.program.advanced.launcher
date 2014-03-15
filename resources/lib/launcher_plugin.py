@@ -314,7 +314,7 @@ class Main:
     def _edit_rom(self, launcher, rom):
         dialog = xbmcgui.Dialog()
         title=os.path.basename(self.launchers[launcher]["roms"][rom]["name"])
-        if (self.launchers[launcher]["roms"][rom]["finished"] == "false"):
+        if (self.launchers[launcher]["roms"][rom]["finished"] != "true"):
             finished_display = __language__( 30339 )
         else:
             finished_display = __language__( 30340 )
@@ -482,7 +482,7 @@ class Main:
                         xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
 
         if (type == 4 ):
-            if (self.launchers[launcher]["roms"][rom]["finished"] == "false"):
+            if (self.launchers[launcher]["roms"][rom]["finished"] != "true"):
                 self.launchers[launcher]["roms"][rom]["finished"] = "true"
             else:
                 self.launchers[launcher]["roms"][rom]["finished"] = "false"
@@ -969,7 +969,11 @@ class Main:
 
     def _edit_category(self, categoryID):
         dialog = xbmcgui.Dialog()
-        type = dialog.select(__language__( 30300 ) % self.categories[categoryID]["name"], [__language__( 30301 ),__language__( 30302 ),__language__( 30303 ),__language__( 30304 )])
+        if (self.categories[categoryID]["finished"] != "true"):
+            finished_display = __language__( 30339 )
+        else:
+            finished_display = __language__( 30340 )
+        type = dialog.select(__language__( 30300 ) % self.categories[categoryID]["name"], [__language__( 30301 ),__language__( 30302 ),__language__( 30303 ),finished_display,__language__( 30304 )])
         if (type == 0 ):
             self._modify_category(categoryID)
         # Category Thumb menu option
@@ -1057,7 +1061,16 @@ class Main:
                         self.categories[categoryID]["fanart"] = image
                         self._save_launchers()
                         xbmc_notify(__language__( 30000 ), __language__( 30075 ),3000)
+
+        # Category status
         if (type == 3 ):
+            if (self.categories[categoryID]["finished"] != "true"):
+                self.categories[categoryID]["finished"] = "true"
+            else:
+                self.categories[categoryID]["finished"] = "false"
+            self._save_launchers()
+
+        if (type == 4 ):
             self._remove_category(categoryID)
         if (type == -1 ):
             self._save_launchers()
@@ -1068,7 +1081,7 @@ class Main:
     def _edit_launcher(self, launcherID):
         dialog = xbmcgui.Dialog()
         title=os.path.basename(self.launchers[launcherID]["name"])
-        if (self.launchers[launcherID]["finished"] == "false"):
+        if (self.launchers[launcherID]["finished"] != "true"):
             finished_display = __language__( 30339 )
         else:
             finished_display = __language__( 30340 )
@@ -1261,10 +1274,10 @@ class Main:
                 self._save_launchers()
                 xbmc.executebuiltin("ReplaceWindow(Programs,%s?%s)" % (self._path, categories_id[selected_cat]))
 
-        # Launcher's Items status
+        # Launcher status
         type_nb = type_nb+1
         if (type == type_nb ):
-            if (self.launchers[launcherID]["finished"] == "false"):
+            if (self.launchers[launcherID]["finished"] != "true"):
                 self.launchers[launcherID]["finished"] = "true"
             else:
                 self.launchers[launcherID]["finished"] = "false"
@@ -1856,7 +1869,7 @@ class Main:
             # Create Categories XML list
             for categoryIndex in sorted(self.categories, key= lambda x : self.categories[x]["name"]):
                 category = self.categories[categoryIndex]
-                xml_content += "\t\t<category>\n\t\t\t<id>"+categoryIndex+"</id>\n\t\t\t<name>"+category["name"]+"</name>\n\t\t\t<thumb>"+category["thumb"]+"</thumb>\n\t\t\t<fanart>"+category["fanart"]+"</fanart>\n\t\t\t<genre>"+category["genre"]+"</genre>\n\t\t\t<description>"+category["plot"]+"</description>\n\t\t</category>\n"
+                xml_content += "\t\t<category>\n\t\t\t<id>"+categoryIndex+"</id>\n\t\t\t<name>"+category["name"]+"</name>\n\t\t\t<thumb>"+category["thumb"]+"</thumb>\n\t\t\t<fanart>"+category["fanart"]+"</fanart>\n\t\t\t<genre>"+category["genre"]+"</genre>\n\t\t\t<description>"+category["plot"]+"</description>\n\t\t\t<finished>"+category["finished"]+"</finished>\n\t\t</category>\n"
             xml_content += "\t</categories>\n\t<launchers>\n"
             # Create Launchers XML list
             for launcherIndex in sorted(self.launchers, key= lambda x : self.launchers[x]["name"]):
@@ -1904,14 +1917,18 @@ class Main:
             categories = re.findall( "<category>(.*?)</category>", xml_categories[0] )
             for category in categories:
                 categorydata = {}
-                category_index = ["id","name","thumb","fanart","genre","plot"]
-                values = re.findall( "<id>(.*?)</id><name>(.*?)</name><thumb>(.*?)</thumb><fanart>(.*?)</fanart><genre>(.*?)</genre><description>(.*?)</description>", category)
+                category_index = ["id","name","thumb","fanart","genre","plot","finished"]
+                values = [re.findall("<id>(.*?)</id>",category), re.findall("<name>(.*?)</name>",category), re.findall("<thumb>(.*?)</thumb>",category), re.findall("<fanart>(.*?)</fanart>",category), re.findall("<genre>(.*?)</genre>",category), re.findall("<description>(.*?)</description>",category), re.findall("<finished>(.*?)</finished>",category)]
+                print values
                 for index, n in enumerate(category_index):
-                    categorydata[n] = values[0][index]
+                    try:
+                        categorydata[n] = values[index][0]
+                    except:
+                        categorydata[n] = ""
                 self.categories[categorydata["id"]] = categorydata
         # Else create the default category
         else:
-            self.categories["default"] = {"id":"default", "name":"Default", "thumb":"", "fanart":"", "genre":"", "plot":""}
+            self.categories["default"] = {"id":"default", "name":"Default", "thumb":"", "fanart":"", "genre":"", "plot":"", "finished":"false"}
         # Get launchers list from XML source
         xml_launchers = re.findall( "<launchers>(.*?)</launchers>", xmlSource )
         # If launchers exist ()...
@@ -1920,9 +1937,15 @@ class Main:
             for launcher in launchers:
                 launcherdata = {}
                 launcher_index = ["id","name","category","application","args","rompath","thumbpath","fanartpath","trailerpath","custompath","romext","gamesys","thumb","fanart","genre","release","studio","plot","finished","minimize","lnk","roms"]        
-                values = re.findall("<id>(.*?)</id><name>(.*?)</name><category>(.*?)</category><application>(.*?)</application><args>(.*?)</args><rompath>(.*?)</rompath><thumbpath>(.*?)</thumbpath><fanartpath>(.*?)</fanartpath><trailerpath>(.*?)</trailerpath><custompath>(.*?)</custompath><romext>(.*?)</romext><platform>(.*?)</platform><thumb>(.*?)</thumb><fanart>(.*?)</fanart><genre>(.*?)</genre><release>(.*?)</release><publisher>(.*?)</publisher><launcherplot>(.*?)</launcherplot><finished>(.*?)</finished><minimize>(.*?)</minimize><lnk>(.*?)</lnk><roms>(.*?)</roms>", launcher)
+                values = [re.findall("<id>(.*?)</id>",launcher), re.findall("<name>(.*?)</name>",launcher), re.findall("<category>(.*?)</category>",launcher), re.findall("<application>(.*?)</application>",launcher), re.findall("<args>(.*?)</args>",launcher), re.findall("<rompath>(.*?)</rompath>",launcher), re.findall("<thumbpath>(.*?)</thumbpath>",launcher), re.findall("<fanartpath>(.*?)</fanartpath>",launcher), re.findall("<trailerpath>(.*?)</trailerpath>",launcher), re.findall("<custompath>(.*?)</custompath>",launcher), re.findall("<romext>(.*?)</romext>",launcher), re.findall("<platform>(.*?)</platform>",launcher), re.findall("<thumb>(.*?)</thumb>",launcher), re.findall("<fanart>(.*?)</fanart>",launcher), re.findall("<genre>(.*?)</genre>",launcher), re.findall("<release>(.*?)</release>",launcher), re.findall("<publisher>(.*?)</publisher>",launcher), re.findall("<launcherplot>(.*?)</launcherplot>",launcher), re.findall("<finished>(.*?)</finished>",launcher), re.findall("<minimize>(.*?)</minimize>",launcher), re.findall("<lnk>(.*?)</lnk>",launcher), re.findall("<roms>(.*?)</roms>",launcher)]
                 for index, n in enumerate(launcher_index):
-                    launcherdata[n] = values[0][index]
+                    try:
+                        launcherdata[n] = values[index][0]
+                    except:
+                        launcherdata[n] = ""
+                # Fix category to unassigned launcher
+                if (launcherdata["category"] == ""):
+                    launcherdata["category"] = "default"
                 # Get roms list from XML source
                 roms = re.findall( "<rom>(.*?)</rom>", launcherdata["roms"] )
                 roms_list = {}
@@ -1931,9 +1954,12 @@ class Main:
                     for rom in roms:
                         romdata = {}
                         rom_index = ["id","name","filename","thumb","fanart","trailer","custom","genre","release","studio","plot","finished","altapp","altarg"]        
-                        r_values = re.findall( "<id>(.*?)</id><name>(.*?)</name><filename>(.*?)</filename><thumb>(.*?)</thumb><fanart>(.*?)</fanart><trailer>(.*?)</trailer><custom>(.*?)</custom><genre>(.*?)</genre><release>(.*?)</release><publisher>(.*?)</publisher><gameplot>(.*?)</gameplot><finished>(.*?)</finished><altapp>(.*?)</altapp><altarg>(.*?)</altarg>", rom)
+                        r_values = [re.findall("<id>(.*?)</id>",rom), re.findall("<name>(.*?)</name>",rom), re.findall("<filename>(.*?)</filename>",rom), re.findall("<thumb>(.*?)</thumb>",rom), re.findall("<fanart>(.*?)</fanart>",rom), re.findall("<trailer>(.*?)</trailer>",rom), re.findall("<custom>(.*?)</custom>",rom), re.findall("<genre>(.*?)</genre>",rom), re.findall("<release>(.*?)</release>",rom), re.findall("<publisher>(.*?)</publisher>",rom), re.findall("<gameplot>(.*?)</gameplot>",rom), re.findall("<finished>(.*?)</finished>",rom), re.findall("<altapp>(.*?)</altapp>",rom), re.findall("<altarg>(.*?)</altarg>",rom)]
                         for r_index, r_n in enumerate(rom_index):
-                            romdata[r_n] = r_values[0][r_index]
+                            try:
+                                romdata[r_n] = r_values[r_index][0]
+                            except :
+                                romdata[r_n] = ""
                         romdata["gamesys"] = launcherdata["gamesys"]
                         roms_list[romdata["id"]] = romdata
                 launcherdata["roms"] = roms_list
@@ -1942,7 +1968,7 @@ class Main:
     def _get_categories( self ):
         for key in sorted(self.categories, key= lambda x : self.categories[x]["name"]):
             if ( not self.settings[ "hide_default_cat" ] or self.categories[key]['id'] != "default" ):
-                self._add_category(self.categories[key]["name"], self.categories[key]["thumb"], self.categories[key]["fanart"], self.categories[key]["genre"], self.categories[key]["plot"], len(self.categories), key)
+                self._add_category(self.categories[key]["name"], self.categories[key]["thumb"], self.categories[key]["fanart"], self.categories[key]["genre"], self.categories[key]["plot"], self.categories[key]["finished"], len(self.categories), key)
         xbmcplugin.endOfDirectory( handle=int( self._handle ), succeeded=True, cacheToDisc=False )
 
     def _get_launchers( self, categoryID ):
@@ -2365,7 +2391,7 @@ class Main:
         else:
             xbmc_notify(__language__( 30000 ), __language__( 30016 ) % (romsCount, skipCount) + " " + __language__( 30050 ),3000)
 
-    def _add_category(self, name, thumb, fanart, genre, plot, total, key):
+    def _add_category(self, name, thumb, fanart, genre, plot, finished, total, key):
         commands = []
         commands.append((__language__( 30512 ), "XBMC.RunPlugin(%s?%s)" % (self._path, SEARCH_COMMAND) , ))
         commands.append((__language__( 30051 ), "XBMC.RunPlugin(%s?%s)" % (self._path, FILE_MANAGER_COMMAND) , ))
@@ -2379,10 +2405,15 @@ class Main:
         else:
             listitem = xbmcgui.ListItem( name, iconImage=icon )
         commands.append(( __language__( 30194 ), "XBMC.RunPlugin(%s?%s/%s)" % (self._path, key, ADD_COMMAND) , ))
+        if ( finished != "true" ):
+            ICON_OVERLAY = 6
+        else:
+            ICON_OVERLAY = 7
         listitem.setProperty("fanart_image", fanart)
-        listitem.setInfo( "video", { "Title": name, "Genre" : genre, "Plot" : plot} )
+        listitem.setInfo( "video", { "Title": name, "Genre" : genre, "Plot" : plot, "overlay": ICON_OVERLAY } )
         listitem.addContextMenuItems( commands )
-        xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s"  % (self._path, key), listitem=listitem, isFolder=True)
+        if ( finished != "true" ) or ( self.settings[ "hide_finished" ] == False) :
+            xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s"  % (self._path, key), listitem=listitem, isFolder=True)
 
     def _add_launcher(self, name, category, cmd, path, thumbpath, fanartpath, trailerpath, custompath, ext, gamesys, thumb, fanart, genre, release, studio, plot, finished, lnk, minimize, roms, total, key) :
         if (int(xbmc.getInfoLabel("System.BuildVersion")[0:2]) < 12 ):
@@ -2411,14 +2442,14 @@ class Main:
             listitem = xbmcgui.ListItem( name, iconImage=icon )
 
         filename = os.path.splitext(cmd)
-        if ( finished == "false" ):
+        if ( finished != "true" ):
             ICON_OVERLAY = 6
         else:
             ICON_OVERLAY = 7
         listitem.setProperty("fanart_image", fanart)
         listitem.setInfo( "video", { "Title": name, "Label": os.path.basename(cmd), "Plot" : plot , "Studio" : studio , "Genre" : genre , "Premiered" : release  , display_date_format : release  , "Writer" : gamesys , "Trailer" : os.path.join(trailerpath), "Director" : os.path.join(custompath), "overlay": ICON_OVERLAY } )
         listitem.addContextMenuItems( commands )
-        if ( finished == "false" ) or ( self.settings[ "hide_finished" ] == False) :
+        if ( finished != "true" ) or ( self.settings[ "hide_finished" ] == False) :
             xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s"  % (self._path, category, key), listitem=listitem, isFolder=folder)
 
     def _add_rom( self, launcherID, name, cmd , romgamesys, thumb, romfanart, romtrailer, romcustom, romgenre, romrelease, romstudio, romplot, finished, altapp, altarg, total, key, search, search_url):
@@ -2434,7 +2465,7 @@ class Main:
             listitem = xbmcgui.ListItem( name, iconImage=icon, thumbnailImage=thumb)
         else:
             listitem = xbmcgui.ListItem( name, iconImage=icon)
-        if ( finished == "false" ):
+        if ( finished != "true" ):
             ICON_OVERLAY = 6
         else:
             ICON_OVERLAY = 7
@@ -2447,7 +2478,7 @@ class Main:
         if search :
             commands.append((__language__( 30513 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, SEARCH_COMMAND) , ))
         listitem.addContextMenuItems( commands )
-        if ( finished == "false" ) or ( self.settings[ "hide_finished" ] == False) :
+        if ( finished != "true" ) or ( self.settings[ "hide_finished" ] == False) :
             xbmcplugin.addDirectoryItem( handle=int( self._handle ), url="%s?%s/%s/%s"  % (self._path, self.launchers[launcherID]["category"], launcherID, key), listitem=listitem, isFolder=False)
 
     def _add_new_rom ( self , launcherID) :
@@ -2528,7 +2559,7 @@ class Main:
         keyboard = xbmc.Keyboard("", __language__( 30112 ))
         keyboard.doModal()
         if (keyboard.isConfirmed()):
-            categorydata = {"name":keyboard.getText(),"thumb":"","fanart":"","genre":"","plot":""}
+            categorydata = {"name":keyboard.getText(),"thumb":"","fanart":"","genre":"","plot":"","finished":"false"}
             categoryid = _get_SID()
             self.categories[categoryid] = categorydata
             self._save_launchers()

@@ -1,3 +1,9 @@
+[B]2.5.0[/B]
+. Add feature to mark categories as finished/unfinished.
+. Modify settings to show/hide finished categories/launcher/items.
+. Improve launchers.xml file parsing.
+. Fix compatibility with launchers.xml files created from 2.0.0 prior versions.
+
 [B]2.4.5[/B]
 . Fix default thumbs and fanarts paths for query and favourite launchers.
 
