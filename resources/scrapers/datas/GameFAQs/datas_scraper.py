@@ -14,12 +14,12 @@ def _get_games_list(search):
         req.add_unredirected_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31')
         f = urllib2.urlopen(req)
         gets = {}
-        gets = re.findall('                                <a href="(.*?)"                                >(.*?)</a></td>', f.read().replace('\r\n', ''))
+        gets = re.findall('<td class="rtitle">(.*?)<a href="(.*?)"(.*?)class="sevent_(.*?)">(.*?)</a></td>', f.read().replace('\r\n', ''))
         for get in gets:
             game = {}
-            gamesystem = get[0].split('/')
-            game["id"] = 'http://www.gamefaqs.com'+get[0]
-            game["title"] = unescape(get[1])
+            gamesystem = get[1].split('/')
+            game["id"] = 'http://www.gamefaqs.com'+get[1]
+            game["title"] = unescape(get[4])
             game["gamesys"] = gamesystem[1].capitalize()
             results.append(game)
             display.append(game["title"]+" / "+game["gamesys"])
@@ -36,11 +36,11 @@ def _get_first_game(search,gamesys):
         req.add_unredirected_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31')
         f = urllib2.urlopen(req)
         gets = {}
-        gets = re.findall('                                <a href="(.*?)"                                >(.*?)</a></td>', f.read().replace('\r\n', ''))
+        gets = re.findall('<td class="rtitle">(.*?)<a href="(.*?)"(.*?)class="sevent_(.*?)">(.*?)</a></td>', f.read().replace('\r\n', ''))
         for get in gets:
             game = {}
-            game["id"] = 'http://www.gamefaqs.com'+get[0]
-            game["title"] = unescape(get[1])
+            game["id"] = 'http://www.gamefaqs.com'+get[1]
+            game["title"] = unescape(get[4])
             game["gamesys"] = gamesys
             results.append(game)
         return results

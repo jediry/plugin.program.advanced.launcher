@@ -1919,7 +1919,6 @@ class Main:
                 categorydata = {}
                 category_index = ["id","name","thumb","fanart","genre","plot","finished"]
                 values = [re.findall("<id>(.*?)</id>",category), re.findall("<name>(.*?)</name>",category), re.findall("<thumb>(.*?)</thumb>",category), re.findall("<fanart>(.*?)</fanart>",category), re.findall("<genre>(.*?)</genre>",category), re.findall("<description>(.*?)</description>",category), re.findall("<finished>(.*?)</finished>",category)]
-                print values
                 for index, n in enumerate(category_index):
                     try:
                         categorydata[n] = values[index][0]
@@ -2678,7 +2677,10 @@ class Main:
                             xbmc.executebuiltin("ReplaceWindow(Programs,%s?%s)" % (self._path,categoryID))
                             return True
             if (type == 2):
-                launcher_query, query = self._find_roms(True)
+                try:
+                    launcher_query, query = self._find_roms(True)
+                except:
+                    return False
                 if (launcher_query):
                     launcherid = _get_SID()
                     app = "xbmc-sea-%s" % launcherid

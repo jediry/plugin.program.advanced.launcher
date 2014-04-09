@@ -1,3 +1,8 @@
+[B]2.5.1[/B]
+. Fix GameFAQs scrapers.
+. Fix empty query launcher bug.
+. Code cleaning.
+
 [B]2.5.0[/B]
 . Add feature to mark categories as finished/unfinished.
 . Modify settings to show/hide finished categories/launcher/items.

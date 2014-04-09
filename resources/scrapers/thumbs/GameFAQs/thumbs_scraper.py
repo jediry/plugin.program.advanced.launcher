@@ -16,24 +16,22 @@ def _get_game_page_url(system,search):
         search_page = urllib2.urlopen(req)
         for line in search_page.readlines():
             if '>Images</a></td>' in line:
-                games.append(re.findall('<a href="(.*?)">Images</a></td>', line.replace('\r\n', '')))
+                games.append(re.findall('<td><a class="sevent_(.*?)" href="(.*?)">Images</a></td>', line.replace('\r\n', '')))
         if games:
-           return ''.join(games[0])
+            return ''.join(games[0][0][1])
     except:
         return ""
 
 # Thumbnails list scrapper
 def _get_thumbnails_list(system,search,region,imgsize):
     covers = []
-    game_id_url = _get_game_page_url(system,search)
+    results = []
     try:
+        game_id_url = _get_game_page_url(system,search)
         req = urllib2.Request('http://www.gamefaqs.com'+game_id_url)
         req.add_unredirected_header('User-Agent', 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.31 (KHTML, like Gecko) Chrome/26.0.1410.64 Safari/537.31')
         game_page = urllib2.urlopen(req)
-        if game_page:
-            for line in game_page.readlines():
-                if 'pod contrib' in line:
-                    results = re.findall('<div class="img boxshot"><a href="(.*?)"><img class="img100" src="(.*?)" alt="(.*?)" /></a>', line)
+        results = re.findall('<div class="img boxshot"><a href="(.*?)"><img class="img100" src="(.*?)" alt="(.*?)" /></a>', game_page.read().replace('\r\n', ''))
         if (region == "All" ):
             return results
         else:
@@ -54,7 +52,6 @@ def _get_thumbnail(image_url):
         for line in search_page.readlines():
             if 'Game Box Shot' in line:
                 images = re.findall('g"><a href="(.*?)"><img class="full_boxshot" src="(.*?)"', line)
-                print images[0][0]
                 return images[0][0]
     except:
         return ""

@@ -16,9 +16,9 @@ def _get_game_page_url(system,search):
         search_page = urllib2.urlopen(req)
         for line in search_page.readlines():
             if '>Images</a></td>' in line:
-                games.append(re.findall('<a href=[^"]*"(.*?)">Images</a></td>', line.replace('\r\n', '')))
+                games.append(re.findall('<td><a class="sevent_(.*?)" href="(.*?)">Images</a></td>', line.replace('\r\n', '')))
         if games:
-            return ''.join(games[0])
+            return ''.join(games[0][0][1])
     except:
         return ""
 
