@@ -1,3 +1,9 @@
+[B]2.5.3[/B]
+. Disable "%rom%" default argument for stand alone launcher.
+
+[B]2.5.2[/B]
+. Fix XBMC Gotham compatibility
+
 [B]2.5.1[/B]
 . Fix GameFAQs scrapers.
 . Fix empty query launcher bug.

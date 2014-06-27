@@ -2583,7 +2583,7 @@ class Main:
             if (type == 0):
                 app = xbmcgui.Dialog().browse(1,__language__( 30023 ),"files",filter)
                 if (app):
-                    argument = self._get_program_arguments(os.path.basename(app))
+                    argument = ""
                     argkeyboard = xbmc.Keyboard(argument, __language__( 30024 ))
                     argkeyboard.doModal()
                     args = argkeyboard.getText()
