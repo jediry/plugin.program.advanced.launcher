@@ -1,3 +1,6 @@
+[B]2.5.5[/B]
+. Fix encoding detection error on Android based systems.
+
 [B]2.5.4[/B]
 . Suspend audio regardless of mediastate. Thanks to zzattack.
 

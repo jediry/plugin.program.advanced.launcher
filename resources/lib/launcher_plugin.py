@@ -406,7 +406,7 @@ class Main:
                                     file_path = os.path.join(os.path.dirname(self.launchers[launcher]["thumbpath"]),os.path.basename(filename.replace("."+filename.split(".")[-1], img_ext)))
                             if ( image != file_path ):
                                 try:
-                                    shutil.copy2( image.decode(sys.getfilesystemencoding(),'ignore') , file_path.decode(sys.getfilesystemencoding(),'ignore') )
+                                    shutil.copy2( image.decode(sys.get_encoding(),'ignore') , file_path.decode(sys.get_encoding(),'ignore') )
                                     if ( self.launchers[launcher]["roms"][rom]["thumb"] != "" ):
                                         _update_cache(file_path)
                                     self.launchers[launcher]["roms"][rom]["thumb"] = file_path
@@ -458,7 +458,7 @@ class Main:
                                     file_path = os.path.join(os.path.dirname(self.launchers[launcher]["fanartpath"]),os.path.basename(filename.replace("."+filename.split(".")[-1], img_ext)))
                             if ( image != file_path ):
                                 try:
-                                    shutil.copy2( image.decode(sys.getfilesystemencoding(),'ignore') , file_path.decode(sys.getfilesystemencoding(),'ignore') )
+                                    shutil.copy2( image.decode(sys.get_encoding(),'ignore') , file_path.decode(get_encoding(),'ignore') )
                                     if ( self.launchers[launcher]["roms"][rom]["fanart"] != "" ):
                                         _update_cache(file_path)
                                     self.launchers[launcher]["roms"][rom]["fanart"] = file_path
@@ -893,7 +893,7 @@ class Main:
             xbmc_notify(__language__( 30000 ), __language__( 30082 ) % os.path.basename(nfo_file),3000)
 
     def _export_rom_nfo(self, launcher, rom):
-        nfo_file=os.path.splitext(self.launchers[launcher]["roms"][rom]["filename"].decode(sys.getfilesystemencoding()))[0]+".nfo"
+        nfo_file=os.path.splitext(self.launchers[launcher]["roms"][rom]["filename"].decode(sys.get_encoding()))[0]+".nfo"
         if (os.path.isfile(nfo_file)):
             shutil.move( nfo_file, nfo_file+".tmp" )
             destination= open( nfo_file, "w" )
@@ -996,7 +996,7 @@ class Main:
                             file_path = os.path.join(DEFAULT_THUMB_PATH,os.path.basename(self.categories[categoryID]["name"])+'_thumb'+img_ext)
                             if ( image != file_path ):
                                 try:
-                                    shutil.copy2( image.decode(sys.getfilesystemencoding(),'ignore') , file_path.decode(sys.getfilesystemencoding(),'ignore') )
+                                    shutil.copy2( image.decode(sys.get_encoding(),'ignore') , file_path.decode(sys.get_encoding(),'ignore') )
                                     if ( self.categories[categoryID]["thumb"] != "" ):
                                         _update_cache(file_path)
                                     self.categories[categoryID]["thumb"] = file_path
@@ -1039,7 +1039,7 @@ class Main:
                             file_path = os.path.join(DEFAULT_FANART_PATH,os.path.basename(self.categories[categoryID]["name"])+'_fanart'+img_ext)
                             if ( image != file_path ):
                                 try:
-                                    shutil.copy2( image.decode(sys.getfilesystemencoding(),'ignore') , file_path.decode(sys.getfilesystemencoding(),'ignore') )
+                                    shutil.copy2( image.decode(sys.get_encoding(),'ignore') , file_path.decode(sys.get_encoding(),'ignore') )
                                     if ( self.categories[categoryID]["fanart"] != "" ):
                                         _update_cache(file_path)
                                     self.categories[categoryID]["fanart"] = file_path
@@ -1185,7 +1185,7 @@ class Main:
                                 file_path = os.path.join(self.settings[ "launcher_thumb_path" ],os.path.basename(self.launchers[launcherID]["application"])+'_thumb'+img_ext)
                             if ( image != file_path ):
                                 try:
-                                    shutil.copy2( image.decode(sys.getfilesystemencoding(),'ignore') , file_path.decode(sys.getfilesystemencoding(),'ignore') )
+                                    shutil.copy2( image.decode(sys.get_encoding(),'ignore') , file_path.decode(sys.get_encoding(),'ignore') )
                                     if ( self.launchers[launcherID]["thumb"] != "" ):
                                         _update_cache(file_path)
                                     self.launchers[launcherID]["thumb"] = file_path
@@ -1235,7 +1235,7 @@ class Main:
                                 file_path = os.path.join(self.settings[ "launcher_fanart_path" ],os.path.basename(self.launchers[launcherID]["application"])+'_fanart'+img_ext)
                             if ( image != file_path ):
                                 try:
-                                    shutil.copy2( image.decode(sys.getfilesystemencoding(),'ignore') , file_path.decode(sys.getfilesystemencoding(),'ignore') )
+                                    shutil.copy2( image.decode(sys.get_encoding(),'ignore') , file_path.decode(sys.get_encoding(),'ignore') )
                                     if ( self.launchers[launcherID]["fanart"] != "" ):
                                         _update_cache(file_path)
                                     self.launchers[launcherID]["fanart"] = file_path
@@ -2295,7 +2295,7 @@ class Main:
                                     if ( img_url !='' ):
                                         try:
                                             download_img(img_url,thumb)
-                                            shutil.copy2( thumb.decode(sys.getfilesystemencoding(),'ignore') , cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
+                                            shutil.copy2( thumb.decode(sys.get_encoding(),'ignore') , cached_thumb.decode(sys.get_encoding(),'ignore') )
                                         except socket.timeout:
                                             xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30604 ),3000)
                                         except exceptions.IOError:
@@ -2350,7 +2350,7 @@ class Main:
                                     if ( img_url !='' ):
                                         try:
                                             download_img(img_url,fanart)
-                                            shutil.copy2( fanart.decode(sys.getfilesystemencoding(),'ignore') , cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
+                                            shutil.copy2( fanart.decode(sys.get_encoding(),'ignore') , cached_thumb.decode(sys.get_encoding(),'ignore') )
                                         except socket.timeout:
                                             xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30606 ),3000)
                                         except exceptions.IOError:
@@ -2875,10 +2875,16 @@ def MyDialog(img_list):
 def xbmc_notify(title,text,time):
     xbmc.executebuiltin("XBMC.Notification(%s,%s,%s,%s)" % (title,text,time,ICON_IMG_FILE))
     
+def get_encoding():
+    try:
+        return sys.getfilesystemencoding()
+    except (UnicodeEncodeError, UnicodeDecodeError):
+        return "utf-8"
+
 def _update_cache(file_path):
     cached_thumb = Thumbnails().get_cached_covers_thumb( file_path ).replace("tbn" , os.path.splitext(file_path)[-1][1:4])
     try:
-        shutil.copy2( file_path.decode(sys.getfilesystemencoding(),'ignore'), cached_thumb.decode(sys.getfilesystemencoding(),'ignore') )
+        shutil.copy2( file_path.decode(sys.get_encoding(),'ignore'), cached_thumb.decode(sys.get_encoding(),'ignore') )
     except OSError:
         xbmc_notify(__language__( 30000 )+" - "+__language__( 30612 ), __language__( 30608 ),3000)
     xbmc.executebuiltin("XBMC.ReloadSkin()")
