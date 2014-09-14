@@ -1,3 +1,9 @@
+[B]2.5.7[/B]
+. Rollback suspend audio feature bring by version 2.5.4.
+
+[B]2.5.6[/B]
+. Fix encoding detection error bug.
+
 [B]2.5.5[/B]
 . Fix encoding detection error on Android based systems.
 
