@@ -1,3 +1,6 @@
+[B]2.5.8[/B]
+. Esthetic update related to Kodi/Helix version.
+
 [B]2.5.7[/B]
 . Rollback suspend audio feature bring by version 2.5.4.
 

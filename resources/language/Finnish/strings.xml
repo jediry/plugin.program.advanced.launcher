@@ -120,7 +120,7 @@
 
     <string id="30201">oletus</string>
     <string id="30202">edistyneet käyttäjät</string>
-    <string id="30203">Vaihda XBMC:n kokoruudun tila</string>
+    <string id="30203">Vaihda Kodi:n kokoruudun tila</string>
     <string id="30204">Päällä</string>
     <string id="30205">Pois</string>
     <string id="30206">Pikakuvake-tuki (.lnk)</string>
@@ -143,7 +143,7 @@
     <string id="30313">Valitse paikallinen kuva (linkitä)</string>
     <string id="30315">Muokkaa parametreja : %s</string>
     <string id="30316">Talleta tiedot NFO-tiedostoon</string>
-    <string id="30329">Vaihda XBMC kokoruudun tilaa : %s</string>
+    <string id="30329">Vaihda Kodi kokoruudun tilaa : %s</string>
     <string id="30317">Muokkaa kohteiden tiedostopäätteitä : %s</string>
     <string id="30318">Tyhjennä kohteiden lista</string>
     <string id="30319">Muokkaa käynnistimen kuvauksia</string>

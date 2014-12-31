@@ -138,7 +138,7 @@
     <string id="30184">Anzahl der Sicherungen</string>
     <string id="30185">Importiere XML Datei (Sicherung wiederherstellen)</string>
     <string id="30186">Wähle zu importierende XML Datei</string>
-    <string id="30187">Advanced Launcher Meldungen in die xbmc.log Datei schreiben</string>
+    <string id="30187">Advanced Launcher Meldungen in die kodi.log Datei schreiben</string>
     <string id="30188">Anzeigeoptionen</string>
     <string id="30189">Verstecke Standard Kategorie</string>
     <string id="30190">Füge XML Datei an (verbinde Programmstarterlisten)</string>
@@ -149,7 +149,7 @@
 
     <string id="30201">standard</string>
     <string id="30202">erfahrene Anwender</string>
-    <string id="30203">XBMC Fenstermodus einschalten</string>
+    <string id="30203">Kodi Fenstermodus einschalten</string>
     <string id="30204">Ein</string>
     <string id="30205">Aus</string>
     <string id="30206">Verknüpfungen (.lnk) unterstützen</string>
@@ -172,7 +172,7 @@
     <string id="30313">Lokales Bild benutzen (Verknüpfung)</string>
     <string id="30315">Parameter: %s</string>
     <string id="30316">In .nfo Datei speichern</string>
-    <string id="30329">XBMC in den Fenstermodus umschalten: %s</string>
+    <string id="30329">Kodiin den Fenstermodus umschalten: %s</string>
     <string id="30317">Dateierweiterungen: %s</string>
     <string id="30318">Daten löschen</string>
     <string id="30319">Programmstarter bearbeiten</string>

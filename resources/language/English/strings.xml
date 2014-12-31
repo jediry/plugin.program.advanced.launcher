@@ -16,7 +16,7 @@
     <string id="30024">Application arguments</string>
     <string id="30025">Set the title of the launcher</string>
     <string id="30026">Query launcher (Adv.L search engine)</string>
-    <string id="30027">Favourite launcher (XBMC favourites)</string>
+    <string id="30027">Favourite launcher (Kodi favourites)</string>
     <string id="30028">Set files extensions, use &quot;|&quot; as separator. (e.g lnk|cbr)</string>
     <string id="30033">Downloading: %s</string>
     <string id="30034">Launching %s.</string>
@@ -108,7 +108,7 @@
     <string id="30149">Semi-automatic</string>
     <string id="30150">Automatic</string>
     <string id="30151">Article ("The","A") at the end</string>
-    <string id="30152">Action on XBMC playing media</string>
+    <string id="30152">Action on Kodi playing media</string>
     <string id="30153">Stop</string>
     <string id="30154">Pause</string>
     <string id="30155">Let Play</string>
@@ -143,7 +143,7 @@
     <string id="30184">Number of backup files to store</string>
     <string id="30185">Import XML file (restore backup)</string>
     <string id="30186">Select the XML file to import</string>
-    <string id="30187">Advanced Launcher logs into xbmc.log file</string>
+    <string id="30187">Advanced Launcher logs into kodi.log file</string>
     <string id="30188">Display options</string>
     <string id="30189">Hide the Default Category</string>
     <string id="30190">Append XML files (merge launchers lists)</string>
@@ -155,7 +155,7 @@
 
     <string id="30201">default</string>
     <string id="30202">experienced users</string>
-    <string id="30203">Toggle XBMC Fullscreen</string>
+    <string id="30203">Toggle Kodi Fullscreen</string>
     <string id="30204">On</string>
     <string id="30205">Off</string>
     <string id="30206">Shortcuts (.lnk) support</string>
@@ -178,7 +178,7 @@
     <string id="30313">Select Local Image (Link)</string>
     <string id="30315">Modify Arguments : %s</string>
     <string id="30316">Save to .nfo file</string>
-    <string id="30329">Toggle XBMC into Windowed mode : %s</string>
+    <string id="30329">Toggle Kodi into Windowed mode : %s</string>
     <string id="30317">Modify Items Extensions : %s</string>
     <string id="30318">Clear Items List</string>
     <string id="30319">Modify Launcher Infos</string>

@@ -129,7 +129,7 @@
     <string id="30184">Nombre de sauvegardes à conserver</string>
     <string id="30185">Importer un fichier XML (restaurer une sauvegarde)</string>
     <string id="30186">Choisir le fichier XML à importer</string>
-    <string id="30187">Afficher les logs d'Advanced Launcher dans xbmc.log</string>
+    <string id="30187">Afficher les logs d'Advanced Launcher dans kodi.log</string>
     <string id="30188">Options d'affichage</string>
     <string id="30189">Cacher la catégorie "Default"</string>
     <string id="30190">Fusionner un fichier XML (joindre les listes de lanceurs)</string>
@@ -141,7 +141,7 @@
 
     <string id="30201">défaut</string>
     <string id="30202">Utilisateurs expérimentés</string>
-    <string id="30203">Basculer XBMC en plein écran</string>
+    <string id="30203">Basculer Kodi en plein écran</string>
     <string id="30204">Activé</string>
     <string id="30205">Désactivé</string>
     <string id="30206">Support des raccourcis (.lnk)</string>
@@ -164,7 +164,7 @@
     <string id="30313">Choisir une image locale (créer un lien)</string>
     <string id="30315">Modifier les arguments : %s</string>
     <string id="30316">Sauver dans un fichier .nfo</string>
-    <string id="30329">Basculer XBMC en mode fenétré : %s</string>
+    <string id="30329">Basculer Kodi en mode fenétré : %s</string>
     <string id="30317">Modifier les extensions des objets : %s</string>
     <string id="30318">Vider la liste des objets</string>
     <string id="30319">Modifier les informations du lanceur</string>
