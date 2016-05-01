@@ -73,7 +73,8 @@ SEARCH_DATE_COMMAND = "%%SEARCH_DATE%%"
 SEARCH_PLATFORM_COMMAND = "%%SEARCH_PLATFORM%%"
 SEARCH_STUDIO_COMMAND = "%%SEARCH_STUDIO%%"
 SEARCH_GENRE_COMMAND = "%%SEARCH_GENRE%%"
-SCAN_NEW_ITEM_COMMAND = "%%SCAN_NEW_ITEM%%"
+SCAN_NEW_ITEMS_COMMAND = "%%SCAN_NEW_ITEM%%"
+ADD_ITEM_COMMAND = "%%ADD_ITEM%%"
 
 # Locales parameters
 __settings__ = Addon( id="plugin.program.advanced.launcher" )
@@ -164,8 +165,10 @@ class Main:
                     self._scrap_thumb_launcher(launcher)
                 elif (rom == GET_FANART):
                     self._scrap_fanart_launcher(launcher)
-                elif (category == SCAN_NEW_ITEM_COMMAND):
+                elif (category == SCAN_NEW_ITEMS_COMMAND):
 					self._import_roms(launcher, addRoms = False)
+                elif (category == ADD_ITEM_COMMAND):
+					self._add_new_rom(launcher)
                 elif (rom == ADD_COMMAND):
                     self._add_roms(launcher)
                 else:
@@ -213,7 +216,7 @@ class Main:
                 category = command_part[0]
                 self._print_log(__language__( 30740 ) % category)
 
-                if (category == SCAN_NEW_ITEM_COMMAND):
+                if (category == SCAN_NEW_ITEMS_COMMAND):
 					self._find_roms(False)
                 if (category == SEARCH_COMMAND):
                     self._find_roms(False)
@@ -2474,6 +2477,8 @@ class Main:
         commands = []
         commands.append((__language__( 30512 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, SEARCH_COMMAND) , ))
         commands.append(( __language__( 30107 ), "XBMC.RunPlugin(%s?%s/%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, key, EDIT_COMMAND) , ))
+        commands.append((__language__( 30105 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, SCAN_NEW_ITEMS_COMMAND, launcherID, "" ) , ))
+        commands.append((__language__( 30320 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, ADD_ITEM_COMMAND, launcherID, "" ) , ))
         if search :
             commands.append((__language__( 30513 ), "XBMC.RunPlugin(%s?%s/%s/%s)" % (self._path, self.launchers[launcherID]["category"], launcherID, SEARCH_COMMAND) , ))
         listitem.addContextMenuItems( commands )
